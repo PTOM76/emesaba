@@ -1,0 +1,139 @@
+command /eaccessory2 [<player>]:
+	trigger:
+		execute arg-1 command "eaccessory"
+command /eaccessory:
+	trigger:
+		if player is in "build_world":
+			send "&c建築サーバーでアクセサリーメニューを開くことはできません。" to player
+			stop
+		open chest with 2 row named "&0アクセサリー" to player
+		set {_slot} to 0
+		loop inventory size of current inventory - 9 times:
+			set slot {_slot} of player's current inventory to {eaccess.slot.%{_slot}%::%player%}
+			add 1 to {_slot}
+		set slot 9 of player's current inventory to black stained glass pane named "Left ear(左耳)"
+		set slot 10 of player's current inventory to black stained glass pane named "Right ear(右耳)"
+		set slot 11 of player's current inventory to black stained glass pane named "Neck(首)"
+		set slot 12 of player's current inventory to black stained glass pane named "Left arm(左腕)"
+		set slot 13 of player's current inventory to black stained glass pane named "Right arm(右腕)"
+		set slot 14 of player's current inventory to black stained glass pane named "Left finger(左指)"
+		set slot 15 of player's current inventory to black stained glass pane named "Right finger(右指)"
+		set slot 16 of player's current inventory to black stained glass pane named "Left foot(左足)"
+		set slot 17 of player's current inventory to black stained glass pane named "Right foot(右足)"
+on inventory click:
+	if name of player's current inventory is "&0アクセサリー":
+		if name of clicked item is "Left ear(左耳)":
+			cancel event
+		if name of clicked item is "Right ear(右耳)":
+			cancel event
+		if name of clicked item is "Neck(首)":
+			cancel event
+		if name of clicked item is "Left arm(左腕)":
+			cancel event
+		if name of clicked item is "Right arm(右腕)":
+			cancel event
+		if name of clicked item is "Left finger(左指)":
+			cancel event
+		if name of clicked item is "Right finger(右指)":
+			cancel event
+		if name of clicked item is "Left foot(左足)":
+			cancel event
+		if name of clicked item is "Right foot(右足)":
+			cancel event
+on inventory close:
+	if name of event-inventory is "&0アクセサリー":
+		set {_slot} to 0
+		loop inventory size of event-inventory - 9 times:
+			set {eaccess.slot.%{_slot}%::%player%} to slot {_slot} of event-inventory
+			add 1 to {_slot}
+		delete {_slot}
+		set {max.heart::%player%} to 10
+		if {eaccess.slot.6::%player%} is downward lit redstone torch with nbt "{HideFlags:1,display:{Name:""&4&lTorch of Life"",Lore:[""&f装着すると体力の最大値+3"",""&f右指だけに着けることができるとか..."",""&fアクセサリーで使用可能""]},ench:[{id:34,lvl:1}]}":
+			add 3 to {max.heart::%player%}
+		if {eaccess.slot.6::%player%} is downward lit redstone torch with nbt "{HideFlags:1,display:{Name:""&4&lTorch of Life2"",Lore:[""&f装着すると体力の最大値+5"",""&f左指か右指に着けることができる。"",""&fアクセサリーで使用可能""]},ench:[{id:34,lvl:1}]}":
+			add 5 to {max.heart::%player%}
+		if {eaccess.slot.5::%player%} is downward lit redstone torch with nbt "{HideFlags:1,display:{Name:""&4&lTorch of Life2"",Lore:[""&f装着すると体力の最大値+5"",""&f左指か右指に着けることができる。"",""&fアクセサリーで使用可能""]},ench:[{id:34,lvl:1}]}":
+			add 5 to {max.heart::%player%}
+		set the maximum health of the player to {max.heart::%player%}
+on leftclick:
+	if {fall.%player%} is 1:
+		if {falling_dash.%player%} is 0:
+			set {fall.%player%} to 1
+			set {falling_dash.%player%} to 1
+			command "execute %player% ~ ~ ~ /playsound item.elytra.flying player @a ~ ~ ~ 1 1"
+			push player horizontally forwards at speed 3
+			wait 30 ticks
+			send "&a次のダブルジャンプ準備完了"
+			set {fall.%player%} to 0
+			set {falling_dash.%player%} to 0
+every ticks:
+	loop all players:
+		if {falling_dash.%loop-player%} is 1:
+			loop all entities in radius 1.5 of loop-player:
+				if loop-entity-2 is not "%loop-player-1%":
+					push loop-entity-2 horizontally forwards at speed 1
+					damage loop-entity-2 by 3 hearts
+					command "execute %loop-player% ~ ~ ~ /playsound entity.player.attack.crit player @a ~ ~ ~ 1 1"
+on sneak toggle:
+	if {eaccess.slot.7::%player%} is white wool with nbt "{HideFlags:1,display:{Name:""&lスゲェ雲"",Lore:[""&fスゲェ雲を履いて空中でスニークすると二段ジャンプ可能"",""&fなんだこれ...スゲェ..."",""&f左足か右足どっちでも履ける。"",""&fアクセサリーで使用可能""]}}":
+		if {fall.%player%} is not set:
+			set {fall.%player%} to 0
+		if {falling_dash.%player%} is not set:
+			set {falling_dash.%player%} to 0
+		if {falling_dash.%player%} is 0:
+			if {fall.%player%} is 0:
+				block below location of player is air or water or tall grass or carpet
+				command "execute %player% ~ ~ ~ /playsound entity.bat.takeoff player @a ~ ~ ~ 1 1"
+				push player upwards at speed 0.7
+				push player horizontally forwards at speed 1
+				set {fall.%player%} to 1
+				while block below location of player is air or water or tall grass or carpet:
+					wait 3 ticks
+				set {fall.%player%} to 0
+	if {eaccess.slot.8::%player%} is white wool with nbt "{HideFlags:1,display:{Name:""&lスゲェ雲"",Lore:[""&fスゲェ雲を履いて空中でスニークすると二段ジャンプ可能"",""&fなんだこれ...スゲェ..."",""&f左足か右足どっちでも履ける。"",""&fアクセサリーで使用可能""]}}":
+		if {fall.%player%} is not set:
+			set {fall.%player%} to 0
+		if {falling_dash.%player%} is not set:
+			set {falling_dash.%player%} to 0
+		if {falling_dash.%player%} is 0:
+			if {fall.%player%} is 0:
+				block below location of player is air or water or tall grass or carpet
+				command "execute %player% ~ ~ ~ /playsound entity.bat.takeoff player @a ~ ~ ~ 1 1"
+				push player upwards at speed 0.7
+				push player horizontally forwards at speed 1
+				set {fall.%player%} to 1
+				while block below location of player is air or water or tall grass or carpet:
+					wait 3 ticks
+				set {fall.%player%} to 0
+on damage:
+	if {fall.%victim%} is 1:
+		if damage cause is fall:
+			cancel event
+every 10 ticks:
+	loop all players:
+		if {eaccess.slot.3::%loop-player%} is clock with nbt "{HideFlags:1,display:{Name:""&e&l&o腕時計"",Lore:[""&f腕時計を腕に着けると時間が表示される。"",""&f左腕か右腕に着けることができる。"",""&fアクセサリーで使用可能""]}}":
+			set bossbar "main.bossbar" color to red
+			set bossbar "main.bossbar" title to "&4&l現在の時刻&7:&4&l&o%now%"
+			set bossbar "main.bossbar" progress to 100
+		if {eaccess.slot.4::%loop-player%} is clock with nbt "{HideFlags:1,display:{Name:""&e&l&o腕時計"",Lore:[""&f腕時計を腕に着けると時間が表示される。"",""&f左腕か右腕に着けることができる。"",""&fアクセサリーで使用可能""]}}":
+			set bossbar "main.bossbar" color to red
+			set bossbar "main.bossbar" title to "&4&l現在の時刻&7:&4&l&o%now%"
+			set bossbar "main.bossbar" progress to 100
+		if {eaccess.slot.7::%loop-player%} is rabbit foot with nbt "{HideFlags:1,display:{Name:""スピードフット"",Lore:[""&fスピードフットを履くと速度がアップする"",""&f足を履くとは..."",""&f左足か右足どっちでも履ける。"",""&fアクセサリーで使用可能""]},ench:[{id:34,lvl:1}]}":
+			command "effect %loop-player% speed 1 10 true"
+		if {eaccess.slot.8::%loop-player%} is rabbit foot with nbt "{HideFlags:1,display:{Name:""スピードフット"",Lore:[""&fスピードフットを履くと速度がアップする"",""&f足を履くとは..."",""&f左足か右足どっちでも履ける。"",""&fアクセサリーで使用可能""]},ench:[{id:34,lvl:1}]}":
+			command "effect %loop-player% speed 1 10 true"
+		if {eaccess.slot.0::%loop-player%} is gold nugget with nbt "{HideFlags:1,display:{Name:""&6&l&oライト付きピアス"",Lore:[""&fこのピアスを耳に着けるとライトがあるので明るくなる。"",""&f左耳か右耳どっちでも着けられる。"",""&fアクセサリーで使用可能""]},ench:[{id:34,lvl:1}]}":
+			command "effect %loop-player% night_vision 30 10 true"
+		if {eaccess.slot.1::%loop-player%} is gold nugget with nbt "{HideFlags:1,display:{Name:""&6&l&oライト付きピアス"",Lore:[""&fこのピアスを耳に着けるとライトがあるので明るくなる。"",""&f左耳か右耳どっちでも着けられる。"",""&fアクセサリーで使用可能""]},ench:[{id:34,lvl:1}]}":
+			command "effect %loop-player% night_vision 30 10 true"
+		if {eaccess.slot.2::%loop-player%} is iron pickaxe with nbt "{HideFlags:1,display:{Name:""&6&l採掘魂"",Lore:[""&f採掘速度+25"",""&f&m採掘魂とか名前ダッサ"",""&f首に着けることができる。"",""&fアクセサリーで使用可能""]},ench:[{id:34,lvl:1}]}":
+			command "effect %loop-player% haste 25 10 true"
+
+command /give_accessory:
+	trigger:
+		#give 1 of white wool with nbt "{HideFlags:1,display:{Name:""&lスゲェ雲"",Lore:[""&fスゲェ雲を履いて空中でスニークすると二段ジャンプ可能"",""&fなんだこれ...スゲェ..."",""&f左足か右足どっちでも履ける。"",""&fアクセサリーで使用可能""]}}" to player
+		#give 1 of clock with nbt "{HideFlags:1,display:{Name:""&e&l&o腕時計"",Lore:[""&f腕時計を腕に着けると時間が表示される。"",""&f左腕か右腕に着けることができる。"",""&fアクセサリーで使用可能""]}}" to player
+		#give 1 of tripwire hook with nbt "{HideFlags:1,display:{Name:""&cカットオールの輪"",Lore:[""&f原木を一括破壊できる。フリーワールド用である。"",""&f&m見た目は輪じゃない"",""&f左指か右指に着けることができる。"",""&fアクセサリーで使用可能""]}}" to player
+		#give 1 of redstone torch with nbt "{HideFlags:1,display:{Name:""&4&lTorch of Life2"",Lore:[""&f装着すると体力の最大値+5"",""&f左指か右指に着けることができる。"",""&fアクセサリーで使用可能""]},ench:[{id:34,lvl:1}]}" to player
+		give 1 of iron pickaxe with nbt "{HideFlags:1,display:{Name:""&6&l採掘魂"",Lore:[""&f採掘速度+25"",""&f&m採掘魂とか名前ダッサ"",""&f首に着けることができる。"",""&fアクセサリーで使用可能""]},ench:[{id:34,lvl:1}]}" to player

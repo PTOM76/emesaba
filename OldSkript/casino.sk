@@ -1,0 +1,623 @@
+command /othello [<text>]:
+	trigger:
+		if arg-1 is "player":
+			send "&6[&e&lLE CASINO&6]&f&6&l%player%&fさんは&0&lオ&f&lセ&0&lロ&f&lゲ&0&lー&f&lム&fで対戦相手を探しています。(&c締め切りまで30秒&f)" to all players
+			send ""
+		if arg-1 is "bot":
+#			send "&6[&e&lLE CASINO&6]&f&6&l%player%&fさんは&0&lオ&f&lセ&0&lロ&f&lゲ&0&lー&f&lム&fでボットと対戦を開始しました。" to all players
+			execute player command "/setinv main"
+			execute player command "/clear %player%"
+			set {othello.color::%player%} to random integer between 1 and 2
+			set {othello.stone::%player%} to 30
+			set {othello.stone::bot} to 30
+			if {othello.color::%player%} is 1:
+				set {othello.black.player::%player%} to "%player%"
+				set {othello.white.player::%player%} to "bot"
+				set {othello.word::%player%} to "&8黒"
+			if {othello.color::%player%} is 2:
+				set {othello.white.player::%player%} to "%player%"
+				set {othello.black.player::%player%} to "bot"
+				set {othello.word::%player%} to "&f白"
+
+#1 is black
+#2 is white
+			open chest with 5 row named "&0&lオ&f&lセ&0&lロ&f&lゲ&0&lー&f&lム&0(PvB)" to player
+			set {_setslot} to 0
+			loop 45 times:
+				set slot {_setslot} of player's current inventory to light gray stained glass pane named "ここをクリックして石を設置"
+				add 1 to {_setslot}
+			set {_setslot} to 0
+			loop 36 times:
+				set slot {_setslot} of player's inventory to light gray stained glass pane named "ここをクリックして石を設置"
+				add 1 to {_setslot}
+			set {_setslot} to 8
+			loop 5 times:
+				set slot {_setslot} of player's current inventory to black stained glass pane named " "
+				add 9 to {_setslot}
+			set {_setslot} to 8
+			loop 4 times:
+				set slot {_setslot} of player's inventory to black stained glass pane named " "
+				add 9 to {_setslot}
+			set {_setslot} to 0
+			loop 8 times:
+				set slot {_setslot} of player's inventory to black stained glass pane named " "
+				add 1 to {_setslot}
+			set slot 8 of player's inventory to end crystal named "&l&m&n=========&8&lオ&f&lセ&8&lロ&f&lゲ&8&lー&f&lム&f&l&m&n=========" with lore "&8黒&7:&f---" and "&f白&7:&f---" and "&fあなたは%{othello.word::%player%}%です。"
+			set slot 30 of player's current inventory to white concrete named "&f石(白)"
+			set slot 31 of player's current inventory to black concrete named "&f石(&8黒&f)"
+			set slot 40 of player's current inventory to white concrete named "&f石(白)"
+			set slot 39 of player's current inventory to black concrete named "&f石(&8黒&f)"
+on inventory click:
+	if name of player's current inventory is "&0&lオ&f&lセ&0&lロ&f&lゲ&0&lー&f&lム&0(PvB)":
+		cancel event
+		if name of clicked item is "ここをクリックして石を設置":
+			if "%clicked inventory%" is "inventory of %player%":
+				if {othello.color::%player%} is 1:
+					set {_slot} to "%clicked slot + 1%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.right} to 1
+					set {_slot} to "%clicked slot - 1%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.left} to 1
+					set {_slot} to "%clicked slot + 9%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.down} to 1
+					set {_slot} to "%clicked slot - 9%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.up} to 1
+					set {_slot} to "%clicked slot + 10%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.down_right} to 1
+					set {_slot} to "%clicked slot - 10%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.up_left} to 1
+					set {_slot} to "%clicked slot + 8%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.down_left} to 1
+					set {_slot} to "%clicked slot - 8%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.up_right} to 1
+					if {_feasible.right} or {_feasible.left} or {_feasible.up} or {_feasible.down} or {_feasible.up_left} or {_feasible.down_left} or {_feasible.up_right} or {_feasible.down_right} is 1:
+						set slot clicked slot of player's inventory to black concrete named "&f石(&8黒&f)"
+						remove 1 from {othello.stone::%{othello.black.player::%player%}%}
+						sound(player, "block.stone.place")
+				if {othello.color::%player%} is 2:
+					set slot clicked slot of player's inventory to white concrete named "&f石(白)"
+					remove 1 from {othello.stone::%{othello.white.player::%player%}%}
+					sound(player, "block.stone.place")
+			else:
+				if {othello.color::%player%} is 1:
+					set {_slot} to "%clicked slot + 1%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.right} to 1
+					set {_slot} to "%clicked slot - 1%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.left} to 1
+					set {_slot} to "%clicked slot + 9%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.down} to 1
+					set {_slot} to "%clicked slot - 9%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.up} to 1
+					set {_slot} to "%clicked slot + 10%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.down_right} to 1
+					set {_slot} to "%clicked slot - 10%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.up_left} to 1
+					set {_slot} to "%clicked slot + 8%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.down_left} to 1
+					set {_slot} to "%clicked slot - 8%"
+					if slot {_slot} of player's current inventory is white concrete:
+						set {_feasible.up_right} to 1
+					if {_feasible.right} or {_feasible.left} or {_feasible.up} or {_feasible.down} or {_feasible.up_left} or {_feasible.down_left} or {_feasible.up_right} or {_feasible.down_right} is 1:
+						set slot clicked slot of player's current inventory to black concrete named "&f石(&8黒&f)"
+						remove 1 from {othello.stone::%{othello.black.player::%player%}%}
+						sound(player, "block.stone.place")
+				if {othello.color::%player%} is 2:
+					set slot clicked slot of player's current inventory to white concrete named "&f石(白)"
+					remove 1 from {othello.stone::%{othello.white.player::%player%}%}
+					sound(player, "block.stone.place")
+		set slot 8 of player's current inventory to {othello.stone::%{othello.white.player::%player%}%} of white concrete named "&f残りの石&7:&f%{othello.stone::%{othello.white.player::%player%}%}%"
+		set slot 17 of player's current inventory to {othello.stone::%{othello.black.player::%player%}%} of black concrete named "&8残りの石&7:&f%{othello.stone::%{othello.black.player::%player%}%}%"
+
+command /dice [<int>] [<text>]:
+	trigger:
+		if arg-1 is set:
+			if arg-2 is not set:
+				set {ech.random1::%player%} to random integer between 1 and arg-1
+				if {ech.random1::%player%} is 1:
+					set {_dice} to "⚀"
+				if {ech.random1::%player%} is 2:
+					set {_dice} to "⚁"
+				if {ech.random1::%player%} is 3:
+					set {_dice} to "⚂"
+				if {ech.random1::%player%} is 4:
+					set {_dice} to "⚃"
+				if {ech.random1::%player%} is 5:
+					set {_dice} to "⚄"
+				if {ech.random1::%player%} is 6:
+					set {_dice} to "⚅"
+				if {ech.random1::%player%} is greater than 7:
+					set {_dice} to "⍰"
+				send "&6[&e&lLE CASINO&6]&f&7%{_dice}% &6&l%player%さん&fは&a%arg-1%角形&fのサイコロを振って %{ech.random1::%player%}% がでました。" to all players
+			if arg-2 is "bluff":
+				if {bluff} is not 1:
+					if type of player's held item is air:
+						send "&6[&e&lLE CASINO&6]&f&6&l%player%&fさんが&a%arg-1%式&fで&e&lブラフゲーム&fを開始しました。(&c締め切りまで30秒&f)" to all players
+					else:
+						set {bluff.item} to player's held item
+						remove player's held item from player
+						set {bluff.item.true} to 1
+						send "&6[&e&lLE CASINO&6]&f&6&l%player%&fさんが&a%arg-1%&a式&f&6&l賞品付き&fで&e&lブラフゲーム&fを開始しました。(&c締め切りまで30秒&f)" to all players
+					set {bluff} to 1
+					set {bluff.duce} to arg-1
+					send "&6[&e&lLE CASINO&6]&f参加する方は＃+半角数字で当ててください。" to all players
+					wait 25 seconds
+					send "&6[&e&lLE CASINO&6]&f&c締め切りまで5秒&f" to all players
+					wait 1 seconds
+					send "&6[&e&lLE CASINO&6]&f&c締め切りまで4秒&f" to all players
+					wait 1 seconds
+					send "&6[&e&lLE CASINO&6]&f&c締め切りまで3秒&f" to all players
+					wait 1 seconds
+					send "&6[&e&lLE CASINO&6]&f&c締め切りまで2秒&f" to all players
+					wait 1 seconds
+					send "&6[&e&lLE CASINO&6]&f&c締め切りまで1秒&f" to all players
+					wait 1 seconds
+					execute player command "/dice %arg-1%"
+					loop {bluff.player::*}:
+						if {bluff.number::%loop-value%} is {ech.random1::%player%}:
+							set {bluff.hit_player} to {bluff.player::%{bluff.number::%loop-value%}%}
+							stop loop
+					if {bluff.hit_player} is set:
+						send "&6[&e&lLE CASINO&6]&f&a%{bluff.hit_player}%さんはサイコロの目とヒットしました！！" to all players
+						if {bluff.item.true} is 1:
+							give {bluff.item} to {bluff.hit_player}
+					else:
+						send "&6[&e&lLE CASINO&6]&f&c誰もヒットしませんでした。" to all players
+						give {bluff.item} to player
+					delete {bluff}
+					delete {bluff.number::*}
+					delete {bluff.player::*}
+					delete {bluff.hit_player}
+					delete {bluff.item}
+					delete {bluff.item.true}
+					delete {bluff.duce}
+				else:
+					send "&6[&e&lLE CASINO&6]&f&c他の方がブラフゲームを開始しているようです。" to player
+on right click:
+	set {_block} to "%block%"
+	if {_block} is "SKULL":
+		loop all entities in radius 7.5 of player:
+			if name of loop-entity is "bluff":
+				execute player command "dice 6 bluff"
+on chat:
+	if {bluff} is 1:
+		set {_number} to message parsed as an integer
+		if {_number} is set:
+			if {bluff.number::%player%} is not set:
+				if {_number} is greater than {bluff.duce}:
+					send "&6[&e&lLE CASINO&6]&f数値が%{bluff.duce}%よりも大きいです。%{bluff.duce}%以下にしてください。"
+					stop
+				loop {bluff.player::*}:
+					if {bluff.number::%loop-value%} is {_number}:
+						set {_bluff.same} to {bluff.number::%loop-value%}
+						stop loop
+				if {_number} is not {_bluff.same}:
+					cancel event
+					set {bluff.number::%player%} to {_number}
+					set {bluff.player::%{_number}%} to player
+					send "&6[&e&lLE CASINO&6]&f&6&l%player%&fさんが&e&lブラフゲーム&fに参加しました。" to all players
+					send "&6[&e&lLE CASINO&6]&f&aあなたは%{bluff.number::%player%}%&aを選びました。" to player
+				else:
+					send "&6[&e&lLE CASINO&6]&f&c既に%{_number}%&cは使われています。" to player
+			else:
+				send "&6[&e&lLE CASINO&6]&f&c既に参加しています。" to player
+		else:
+			send "&6[&e&lLE CASINO&6]&f&c＃+半角数字を入力してください" to player
+command /ech [<text>] [<text>]:
+	trigger:
+		if arg-1 is "new":
+			if arg-2 is set:
+				set {ech.moneys.%player%} to 0
+				send "&6[&e&lLE CASINO&6]&f&6&l%player%&fさんが&7%arg-2%EM&fで&c丁&a半&fを開始しました。(&c締め切りまで30秒&f)" to all players
+				command "/tellraw @a ["""",{""text"":""[\u4e01]"",""bold"":true,""underlined"":true,""color"":""red"",""clickEvent"":{""action"":""suggest_command"",""value"":""/ech c %player%""},""hoverEvent"":{""action"":""show_text"",""value"":""§c\u534a(\u5947\u6570)""}},{""text"":"" | ""},{""text"":""[\u534a]"",""bold"":true,""underlined"":true,""color"":""green"",""clickEvent"":{""action"":""suggest_command"",""value"":""/ech h %player%""},""hoverEvent"":{""action"":""show_text"",""value"":""§a\u534a(\u5947\u6570)""}},{""text"":"" \u30af\u30ea\u30c3\u30af\u3057\u3066\u9078\u629e""}]"
+				set {ech.money::%player%} to arg-2 parsed as an integer
+				wait 27 seconds
+				send "&6[&e&lLE CASINO&6]&f&c締め切りまで3秒&f" to all players
+				wait 1 seconds
+				send "&6[&e&lLE CASINO&6]&f&c締め切りまで2秒&f" to all players
+				wait 1 seconds
+				send "&6[&e&lLE CASINO&6]&f&c締め切りまで1秒&f" to all players
+				wait 1 seconds
+				if size of {echo.join.players.%player%::*} + size of {ehan.join.players.%player%::*} is less than or equal to 1:
+					send "&6[&e&lLE CASINO&6]&f&c人数が集まらなかったため中止しました。" to all players
+					delete {ehan.join.players.%player%::*}
+					delete {echo.join.players.%player%::*}
+					delete {ehan.join.players.%player%.loop::*}
+					delete {echo.join.players.%player%.loop::*}
+					stop
+				send "&6[&e&lLE CASINO&6]&f&aサイコロを振っています..." to all players
+				set {ech.random1::%player%} to random integer between 1 and 6
+				set {ech.random2::%player%} to random integer between 1 and 6
+				if {ech.random1::%player%} is 1:
+					set {_dice} to "⚀"
+				if {ech.random2::%player%} is 1:
+					set {_dice2} to "⚀"
+				if {ech.random1::%player%} is 2:
+					set {_dice} to "⚁"
+				if {ech.random2::%player%} is 2:
+					set {_dice2} to "⚁"
+				if {ech.random1::%player%} is 3:
+					set {_dice} to "⚂"
+				if {ech.random2::%player%} is 3:
+					set {_dice2} to "⚂"
+				if {ech.random1::%player%} is 4:
+					set {_dice} to "⚃"
+				if {ech.random2::%player%} is 4:
+					set {_dice2} to "⚃"
+				if {ech.random1::%player%} is 5:
+					set {_dice} to "⚄"
+				if {ech.random2::%player%} is 5:
+					set {_dice2} to "⚄"
+				if {ech.random1::%player%} is 6:
+					set {_dice} to "⚅"
+				if {ech.random2::%player%} is 6:
+					set {_dice2} to "⚅"
+				send "&6[&e&lLE CASINO&6]&f&7%{_dice}% &7%{_dice2}%" to all players
+				wait 1 seconds
+				send "&6[&e&lLE CASINO&6]&f1つ目のサイコロが%{ech.random1::%player%}%で、2つ目のサイコロが%{ech.random2::%player%}%なので、合計は%{ech.random1::%player%} + {ech.random2::%player%}%になりました。" to all players
+				set {ech.dice.total} to {ech.random1::%player%} + {ech.random2::%player%} parsed as an integer
+				if {ech.dice.total} is divisible by 2:
+					send "&6[&e&lLE CASINO&6]&f&c偶数なので丁が勝ちました。" to all players
+					loop {echo.join.players.%player%::*}:
+						set {echo.join.players.%player%.loop::%loop-index%} to loop-value
+					loop {ehan.join.players.%player%::*}:
+						set {ehan.join.players.%player%.loop::%loop-index%} to loop-value
+
+					loop {ehan.join.players.%player%.loop::*}:
+						command "emc %loop-value% remove %{ech.money::%player%}%"
+						send "&a%loop-value% -%{ech.money::%loop-value%}%" to all players
+					loop {echo.join.players.%player%.loop::*}:
+						command "emc %loop-value% add %{ech.moneys.%player%} / (size of {echo.join.players.%player%::*})%"
+						send "&c%loop-value% +%{ech.moneys.%player%} / (size of {echo.join.players.%player%::*})%" to all players
+				else:
+					send "&6[&e&lLE CASINO&6]&f&a奇数なので半が勝ちました。" to all players
+					loop {echo.join.players.%player%::*}:
+						set {echo.join.players.%player%.loop::%loop-index%} to loop-value
+					loop {ehan.join.players.%player%::*}:
+						set {ehan.join.players.%player%.loop::%loop-index%} to loop-value
+					loop {echo.join.players.%player%.loop::*}:
+						command "emc %loop-value% remove %{ech.money::%player%}%"
+						send "&c%loop-value% -%{ech.money::%player%}%" to all players
+					loop {ehan.join.players.%player%.loop::*}:
+						command "emc %loop-value% add %{ech.moneys.%player%} / (size of {ehan.join.players.%player%::*})%"
+						send "&a%loop-value% +%{ech.moneys.%player%} / (size of {ehan.join.players.%player%::*})%" to all players
+				delete {ehan.join.players.%player%::*}
+				delete {echo.join.players.%player%::*}
+				delete {ehan.join.players.%player%.loop::*}
+				delete {echo.join.players.%player%.loop::*}
+
+		if arg-1 is "c":
+			if {echo.join.players.%arg-2%::*} contains player:
+				send "&cあなたは既に参加しています。"
+				stop
+			if {ehan.join.players.%arg-2%::*} contains player:
+				send "&cあなたは既に参加しています。"
+				stop
+			if {balance::%player%} is greater than {ech.money::%arg-2%}:
+				add {ech.money::%arg-2%} to {ech.moneys.%arg-2%}
+				send "&6[&e&lLE CASINO&6]&f&c%player%&fさんが丁を選択しました。&7(%{ech.moneys.%arg-2%}%)" to all players
+				add "%player%" to {echo.join.players.%arg-2%::*}
+			else:
+				send "&6[&e&lLE CASINO&6]&f&c%{ech.money::%arg-2%}%EM以上必要です。" to player
+		if arg-1 is "h":
+			if {echo.join.players.%arg-2%::*} contains player:
+				send "&cあなたは既に参加しています。"
+				stop
+			if {ehan.join.players.%arg-2%::*} contains player:
+				send "&cあなたは既に参加しています。"
+				stop
+			if {balance::%player%} is greater than {ech.money::%arg-2%}:
+				add {ech.money::%arg-2%} to {ech.moneys.%arg-2%}
+				send "&6[&e&lLE CASINO&6]&f&a%player%&fさんが半を選択しました。&7(%{ech.moneys.%arg-2%}%)" to all players
+				add "%player%" to {ehan.join.players.%arg-2%::*}
+			else:
+				send "&6[&e&lLE CASINO&6]&f&c%{ech.money::%arg-2%}%EM以上必要です。" to player
+command /ecoinsign [<int>]:
+	permission: admin
+	trigger:
+		set {_price} to arg 1 * 10000
+		send "%{_price}%"
+		command "/give %player% minecraft:sign 1 0 {BlockEntityTag:{Text1:""{\""text\"":\""[CasinoSlotCoin]\"",\""clickEvent\"":{\""action\"":\""run_command\"",\""value\"":\""eget2 coin %arg-1% @p\""}}"",Text2:""{\""text\"":\""\\u53f3\\u30af\\u30ea\\u30c3\\u30af\\u3067\\u8cfc\\u5165\"",\""underlined\"":true,\""color\"":\""dark_blue\""}"",Text3:""[\""\"",{\""text\"":\""%{_price}%\"",\""color\"":\""green\""},{\""text\"":\""EM x \""},{\""text\"":\""%arg-1%\"",\""color\"":\""light_purple\""}]"",Text4:""{\""text\"":\""[CasinoSlotCoin]\""}""},display:{Name:""%arg-1%コイン購入看板""}}"
+command /eget [<text>] [<integer>]:
+	trigger:
+		if player is in "build_world":
+			send "建築サーバーでこのコマンドを使うことはできません。" to player
+			stop
+		if arg-1 is "coin":
+			set {ebig_buytotal} to 10000 * arg-2
+			if {balance::%player%} is greater than or equal to {ebig_buytotal}:
+				command "emc %player% remove %{ebig_buytotal}%"
+				if arg-2 is greater than 64:
+					set {_div} to arg-2/64
+					set {_rem} to mod(arg-2, 64)
+					loop {_div} times:
+						command "give %player% magma_cream 64 0 %{coinnbt::slotmachine}%"
+					command "give %player% magma_cream %{_rem}% 0 %{coinnbt::slotmachine}%"
+				else:
+					command "give %player% magma_cream %arg-2% 0 %{coinnbt::slotmachine}%"	
+				send "§6§k§l1§e§l§n§oCasino coin§6§k§l1§fを&6&l%arg-2%個&f購入しました。" to player
+			else:
+				send "&cお金が足りません。"
+		if arg-1 is "ebig":
+			set {coin_buytotal} to 10000 * arg-2
+			if {balance::%player%} is greater than or equal to {coin_buytotal}:
+				command "emc %player% remove %{coin_buytotal}%"
+				if arg-2 is greater than 64:
+					set {_div} to arg-2/64
+					set {_rem} to mod(arg-2, 64)
+					loop {_div} times:
+						command "give %player% paper 64 0 {display:{Name:""§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§r""}}"
+					command "give %player% paper %{_rem}% 0 {display:{Name:""§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§r""}}"
+				else:
+					command "give %player% paper %arg-2% 0 {display:{Name:""§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§r""}}"
+				send "§6§k§l1§e§l§n§oCasino coin§6§k§l1§fを&6&l%arg-2%個&f購入しました。" to player
+			else:
+				send "&cお金が足りません。"
+command /eget2 [<text>] [<integer>] [<player>]:
+	permission: admin
+	trigger:
+		if arg-1 is "ebig":
+			set {ebig_buytotal} to 50000 * arg-2
+			if {balance::%arg-3%} is greater than or equal to {ebig_buytotal}:
+				command "emc %arg-3% remove %{ebig_buytotal}%"
+				command "give %arg-3% paper %arg-2% 0 {display:{Name:""§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§r""}}"
+				send "§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§rを&6&l%arg-2%個&f購入しました。" to arg-3
+			else:
+				send "&cお金が足りません。"
+		if arg-1 is "coin":
+			set {coin_buytotal} to 10000 * arg-2
+			if {balance::%arg-3%} is greater than or equal to {coin_buytotal}:
+				command "emc %arg-3% remove %{coin_buytotal}%"
+				if arg-2 is greater than 64:
+					set {_div} to arg-2/64
+					set {_rem} to mod(arg-2, 64)
+					loop {_div} times:
+						command "give %arg-3% magma_cream 64 0 %{coinnbt::slotmachine}%"
+					command "give %arg-3% magma_cream %{_rem}% 0 %{coinnbt::slotmachine}%"
+				else:
+					command "give %arg-3% magma_cream %arg-2% 0 %{coinnbt::slotmachine}%"	
+				send "§6§k§l1§e§l§n§oCasino coin§6§k§l1§fを&6&l%arg-2%個&f購入しました。" to arg-3
+			else:
+				send "&cお金が足りません。"
+		if arg-1 is "grasscoin":
+			set {coin_buytotal} to 10000 * arg-2
+			if {balance::%arg-3%} is greater than or equal to {coin_buytotal}:
+				command "emc %arg-3% remove %{coin_buytotal}%"
+				command "give %arg-3% magma_cream %arg-2% 0 {HideFlags:1,ench:[{id:34,lvl:1}],display:{Name:""§2§k§l1§a§l§n§oShine grass coin§2§k§l1§f"",Lore:[""§e§lカジノ§fのシャイングラスガチャで使うことができるガチャコイン""]}}"
+				send "§6§k§l1§e§l§n§oCasino coin§6§k§l1§fを&6&l%arg-2%個&f購入しました。" to arg-3
+			else:
+				send "&cお金が足りません。"
+on rightclick:
+	if player is sneaking:
+		set {count::%player%} to 64
+	else:
+		set {count::%player%} to 1
+
+command /eget3 [<text>] [<player>]:
+	permission: admin
+	trigger:
+		if arg-1 is "ebig":
+			set {ebig_buytotal} to 50000 * {count::%arg-2%}
+			if {balance::%arg-2%} is greater than or equal to {ebig_buytotal}:
+				command "emc %arg-2% remove %{ebig_buytotal}%"
+				command "give %arg-2% paper %{count::%arg-2%}% 0 {display:{Name:""§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§r""}}"
+				send "§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§rを&6&l%{count::%arg-2%}%個&f購入しました。" to arg-2
+			else:
+				send "&cお金が足りません。"
+		if arg-1 is "coin":
+			set {coin_buytotal} to 10000 * {count::%arg-2%}
+			if {balance::%arg-2%} is greater than or equal to {coin_buytotal}:
+				command "emc %arg-2% remove %{coin_buytotal}%"
+				command "give %arg-2% magma_cream %{count::%arg-2%}% 0 %{coinnbt::slotmachine}%"
+				send "§6§k§l1§e§l§n§oCasino coin§6§k§l1§fを&6&l%{count::%arg-2%}%個&f購入しました。" to arg-2
+			else:
+				send "&cお金が足りません。"
+		if arg-1 is "grasscoin":
+			set {coin_buytotal} to 10000 * {count::%arg-2%}
+			if {balance::%arg-2%} is greater than or equal to {coin_buytotal}:
+				command "emc %arg-2% remove %{coin_buytotal}%"
+				command "give %arg-2% magma_cream %{count::%arg-2%}% 0 {HideFlags:1,ench:[{id:34,lvl:1}],display:{Name:""§2§k§l1§a§l§n§oShine grass coin§2§k§l1§f"",Lore:[""§e§lカジノ§fのシャイングラスガチャで使うことができるガチャコイン""]}}"
+				send "§6§k§l1§e§l§n§oCasino coin§6§k§l1§fを&6&l%{count::%arg-2%}%個&f購入しました。" to arg-2
+			else:
+				send "&cお金が足りません。"
+on rightclick with paper:
+	if player is holding a paper with nbt "{display:{Name:""§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§r""}}":
+		if player is in "build_world":
+			send "建築サーバーでEBIGを使うことはできません。" to player
+			stop
+		set {ebig_random1::%player%} to random integer between 1 and 10000
+		wait 0.1 tick
+		remove a paper with nbt "{display:{Name:""§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§r""}}" from inventory of player
+		add 1 to {c_ebig1_time::%player%}
+		if {ebig_random1::%player%} is 50:
+			execute console command "/title @a title ""&9&n&l%player%は§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§rで%{casino_ebig1::ebig1}%EMをゲットした"""
+			execute console command "/playsound entity.wither.ambient player @a ~ ~ ~ 1 2"
+			execute console command "/playsound entity.wither.ambient player @a ~ ~ ~ 1 0"
+			command "emc %player% add %{casino_ebig1::ebig1}%"
+			set {casino_ebig1::ebig1} to 5000000000
+		else:
+			add 50000 to {casino_ebig1::ebig1}
+			send "&c50000EMを無駄にした...&f" to player
+			send "番号:%{ebig_random1::%player%}%" to player
+			send "&aストック&7:&a%{casino_ebig1::ebig1}%" to player
+on leftclick with paper:
+	if player is holding a paper with nbt "{display:{Name:""§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§r""}}":
+		if player is in "build_world":
+			send "建築サーバーでEBIGを使うことはできません。" to player
+			stop
+		if {c_ebig1_check::%player%} is 1:
+			send "[ebig system]&c計算中です。" to player
+			wait 1 ticks
+			set {c_ebig1_check::%player%} to 0
+			stop
+		else:
+			set {c_ebig1_check::%player%} to 1
+			wait 1 tick
+			set {ebig_count} to amount of paper with nbt "{display:{Name:""§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§r""}}" in player's inventory
+			set {_div} to {ebig_count}/64
+			set {_rem} to mod({ebig_count}, 64)
+			wait 1 tick
+			add {ebig_count} to {c_ebig1_time::%player%}#今までプレイヤーが買ってきた数らしい
+			loop {_div} times:
+				remove 64 of paper with nbt "{display:{Name:""§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§r""}}" from player's inventory
+				set {ebig_random1::%player%} to random integer between 1 and 7800
+				if {ebig_random1::%player%} is 50:
+					execute console command "/title @a title ""&9&n&l%player%は§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§rで%{casino_ebig1::ebig1}%EMをゲットした"""
+					execute console command "/playsound entity.wither.ambient player @a ~ ~ ~ 1 2"
+					execute console command "/playsound entity.wither.ambient player @a ~ ~ ~ 1 0"
+					command "emc %player% add %{casino_ebig1::ebig1}%"
+					set {casino_ebig1::ebig1} to 50000000000
+				else:
+					add 50000 to {casino_ebig1::ebig1}
+			if {_rem} is not 0:
+				remove {_rem} of paper with nbt "{display:{Name:""§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§r""}}" from player's inventory
+				set {ebig_random1::%player%} to random integer between 1 and (499200/{_rem} parsed as an integer)
+				if {ebig_random1::%player%} is 50:
+					execute console command "/title @a title ""&9&n&l%player%は§4§l§n§o§k§a§r§2§l§n§oE§4§l§n§oBIG§4§l§n§o§k§a§rで%{casino_ebig1::ebig1}%EMをゲットした"""
+					execute console command "/playsound entity.wither.ambient player @a ~ ~ ~ 1 2"
+					execute console command "/playsound entity.wither.ambient player @a ~ ~ ~ 1 0"
+					command "emc %player% add %{casino_ebig1::ebig1}%"
+					set {casino_ebig1::ebig1} to 50000000000
+				else:
+					add 50000 to {casino_ebig1::ebig1}				
+			set {c_ebig1_check::%player%} to 0
+			send "&c%50000 * {ebig_count}%EMを無駄にした..." to player
+			send "&aストック&7:&a%{casino_ebig1::ebig1}%" to player
+command /checknull:
+	trigger:
+		set {c_ebig1_check::%player%} to 0
+on break of cobblestone:
+	if player is holding iron pickaxe with nbt "{CanDestroy:[""minecraft:cobblestone"",""minecraft:coal_block"",""minecraft:iron_block"",""minecraft:emerald_block"",""minecraft:gold_block"",""minecraft:diamond_block""],HideFlags:13,Unbreakable:1,display:{Name:""§e§ka§r§6§l§nカジノピッケル§e§ka§r"",Lore:[""§fマイニングロッタリーに使うピッケルである。"",""§f掘れる鉱石§7:§fすべての鉱石"",""§f採掘できる場所§7:§fカジノのみ""]},ench:[{id:32,lvl:3}]}":
+		loop all entities in radius 3 of player:
+			if name of loop-entity is "mls1":
+				if {balance::%player%} is greater than or equal to 10000:
+					command "/emc %player% remove 10000"
+					set {casino_random1::%player%} to random integer between 1 and 10
+					if {casino_random1::%player%} is 1:
+						send "&l%player%&rさんは&e&l&nストーンマイニングロッタリー&rで&2&l150000EM&rをゲットしました。" to all players
+						command "/emc %player% add 150000"
+					else:
+						send "&c何もゲットできませんでした。" to player
+				else:
+					send "&cお金が足りません。"
+on break of coal block:
+	if player is holding iron pickaxe with nbt "{CanDestroy:[""minecraft:cobblestone"",""minecraft:coal_block"",""minecraft:iron_block"",""minecraft:emerald_block"",""minecraft:gold_block"",""minecraft:diamond_block""],HideFlags:13,Unbreakable:1,display:{Name:""§e§ka§r§6§l§nカジノピッケル§e§ka§r"",Lore:[""§fマイニングロッタリーに使うピッケルである。"",""§f掘れる鉱石§7:§fすべての鉱石"",""§f採掘できる場所§7:§fカジノのみ""]},ench:[{id:32,lvl:3}]}":
+		loop all entities in radius 3 of player:
+			if name of loop-entity is "mls1":
+				if {balance::%player%} is greater than or equal to 100000:
+					command "/emc %player% remove 100000"
+					set {casino_random1::%player%} to random integer between 1 and 10
+					if {casino_random1::%player%} is 1:
+						send "&l%player%&rさんは&e&l&nコールマイニングロッタリー&rで&2&l1500000EM&rをゲットしました。" to all players
+						command "/emc %player% add 1500000"
+					else:
+						send "&c何もゲットできませんでした。" to player
+				else:
+					send "&cお金が足りません。"
+on break of iron block:
+	if player is holding iron pickaxe with nbt "{CanDestroy:[""minecraft:cobblestone"",""minecraft:coal_block"",""minecraft:iron_block"",""minecraft:emerald_block"",""minecraft:gold_block"",""minecraft:diamond_block""],HideFlags:13,Unbreakable:1,display:{Name:""§e§ka§r§6§l§nカジノピッケル§e§ka§r"",Lore:[""§fマイニングロッタリーに使うピッケルである。"",""§f掘れる鉱石§7:§fすべての鉱石"",""§f採掘できる場所§7:§fカジノのみ""]},ench:[{id:32,lvl:3}]}":
+		loop all entities in radius 3 of player:
+			if name of loop-entity is "mls1":
+				if {balance::%player%} is greater than or equal to 300000:
+					command "/emc %player% remove 300000"
+					set {casino_random1::%player%} to random integer between 1 and 15
+					if {casino_random1::%player%} is 1:
+						send "&l%player%&rさんは&e&l&nアイアンマイニングロッタリー&rで&2&l5000000EM&rをゲットしました。" to all players
+						command "/emc %player% add 5000000"
+					else:
+						send "&c何もゲットできませんでした。" to player
+				else:
+					send "&cお金が足りません。"
+			if name of loop-entity is "mls2":
+				if {balance::%player%} is greater than or equal to 10000:
+					command "/emc %player% remove 10000"
+					set {casino_random1::%player%} to random integer between 1 and 3
+					if {casino_random1::%player%} is 1:
+						send "&l%player%&rさんは&e&l&n危険IMロッタリー&rで&2&l15000EM&rをゲットしました。" to all players
+						command "/emc %player% add 15000"
+					else:
+						send "&c何もゲットできませんでした。" to player
+				else:
+					send "&cお金が足りません。"
+on break of gold block:
+	if player is holding iron pickaxe with nbt "{CanDestroy:[""minecraft:cobblestone"",""minecraft:coal_block"",""minecraft:iron_block"",""minecraft:emerald_block"",""minecraft:gold_block"",""minecraft:diamond_block""],HideFlags:13,Unbreakable:1,display:{Name:""§e§ka§r§6§l§nカジノピッケル§e§ka§r"",Lore:[""§fマイニングロッタリーに使うピッケルである。"",""§f掘れる鉱石§7:§fすべての鉱石"",""§f採掘できる場所§7:§fカジノのみ""]},ench:[{id:32,lvl:3}]}":
+		loop all entities in radius 3 of player:
+			if name of loop-entity is "mls1":
+				if {balance::%player%} is greater than or equal to 1000000:
+					command "/emc %player% remove 1000000"
+					set {casino_random1::%player%} to random integer between 1 and 9
+					if {casino_random1::%player%} is 1:
+						send "&l%player%&rさんは&e&l&nゴールドマイニングロッタリー&rで&2&l10000000EM&rをゲットしました。" to all players
+						command "/emc %player% add 10000000"
+					else:
+						send "&c何もゲットできませんでした。" to player
+				else:
+					send "&cお金が足りません。"
+			if name of loop-entity is "mls2":
+				if {balance::%player%} is greater than or equal to 1000000:
+					command "/emc %player% remove 1000000"
+					set {casino_random1::%player%} to random integer between 1 and 3
+					if {casino_random1::%player%} is 1:
+						send "&l%player%&rさんは&e&l&n危険GMロッタリー&rで&2&l2500000EM&rをゲットしました。" to all players
+						command "/emc %player% add 2500000"
+					else:
+						send "&c何もゲットできませんでした。" to player
+				else:
+					send "&cお金が足りません。"
+on break of diamond block:
+	if player is holding iron pickaxe with nbt "{CanDestroy:[""minecraft:cobblestone"",""minecraft:coal_block"",""minecraft:iron_block"",""minecraft:emerald_block"",""minecraft:gold_block"",""minecraft:diamond_block""],HideFlags:13,Unbreakable:1,display:{Name:""§e§ka§r§6§l§nカジノピッケル§e§ka§r"",Lore:[""§fマイニングロッタリーに使うピッケルである。"",""§f掘れる鉱石§7:§fすべての鉱石"",""§f採掘できる場所§7:§fカジノのみ""]},ench:[{id:32,lvl:3}]}":
+		loop all entities in radius 3 of player:
+			if name of loop-entity is "mls1":
+				if {balance::%player%} is greater than or equal to 100000:
+					command "/emc %player% remove 100000"
+					set {casino_random1::%player%} to random integer between 1 and 750
+					if {casino_random1::%player%} is 1:
+						send "&l%player%&rさんは&e&l&nダイヤモンドマイニングロッタリー&rで&2&l1000000000EM&rをゲットしました。" to all players
+						command "/emc %player% add 1000000000"
+					else:
+						send "&c何もゲットできませんでした。" to player
+				else:
+					send "&cお金が足りません。"
+			if name of loop-entity is "mls2":
+				if {balance::%player%} is greater than or equal to 1000000000:
+					command "/emc %player% remove 1000000000"
+					set {casino_random1::%player%} to random integer between 1 and 3
+					if {casino_random1::%player%} is 1:
+						send "&l%player%&rさんは&e&l&n危険DMロッタリー&rで&2&l2000000000EM&rをゲットしました。" to all players
+						command "/emc %player% add 2500000000"
+					else:
+						send "&c何もゲットできませんでした。" to player
+				else:
+					send "&cお金が足りません。"
+on break of emerald block:
+	if player is holding iron pickaxe with nbt "{CanDestroy:[""minecraft:cobblestone"",""minecraft:coal_block"",""minecraft:iron_block"",""minecraft:emerald_block"",""minecraft:gold_block"",""minecraft:diamond_block""],HideFlags:13,Unbreakable:1,display:{Name:""§e§ka§r§6§l§nカジノピッケル§e§ka§r"",Lore:[""§fマイニングロッタリーに使うピッケルである。"",""§f掘れる鉱石§7:§fすべての鉱石"",""§f採掘できる場所§7:§fカジノのみ""]},ench:[{id:32,lvl:3}]}":
+		loop all entities in radius 3 of player:
+			if name of loop-entity is "mls1":
+				if {balance::%player%} is greater than or equal to 1000000:
+					command "/emc %player% remove 1000000"
+					set {casino_random1::%player%} to random integer between 1 and 10
+					if {casino_random1::%player%} is 1:
+						
+						send "&l%player%&rさんは&e&l&nエメラルドマイニングロッタリー&rで&2&l%{casino_emerald_stock::casino_es1}%EM&rをゲットしました。" to all players
+						command "/emc %player% add %{casino_emerald_stock::casino_es1}%"
+						set {casino_emerald_stock::casino_es1} to 10000000
+					else:
+						add 250000 to {casino_emerald_stock::casino_es1}
+						send "&c何もゲットできませんでした。" to player
+						send "&aストック&7:&a%{casino_emerald_stock::casino_es1}%" to player
+
+				else:
+					send "&cお金が足りません。"

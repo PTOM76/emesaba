@@ -1,0 +1,248 @@
+on load:
+	set {dsg_title} to "Emerald Item Manager"
+	set {dsg_text} to "建築サーバーでDSGを開くことはできません。"
+	set {dsg_buy} to "&c&lBUY&f(購入)"
+	set {dsg_sell} to "&a&lSELL&f(売却)"
+	set {dsg_back} to "&4&lBACK&f(戻る)"
+	set {dsg_sell2} to "&c&lSELL&f(売却)"
+	set {dsg_nextp} to "&c&lNEXT PAGE&f(次のページへ)"
+	set {dsg_backp} to "&c&lBACK PAGE&f(前のページへ)"
+command /eim:
+	trigger:
+		command "/dsg %player%"
+command /dsg [<player>]:
+	permission: admin
+	trigger:
+		wait 1 ticks
+
+		if arg-1 is in "build_world":
+			send "%{dsg_text}%" to arg-1
+			stop
+		sound(arg-1, "block.chest.open")
+		open chest with 3 row named "%{dsg_title}%" to arg-1
+		set {_setslot} to 0
+		loop 9 times:
+			if {_setslot} is 3:
+				set {_setslot} to 9
+			if {_setslot} is 12:
+				set {_setslot} to 18
+			set slot {_setslot} of arg-1's current inventory to red stained glass pane named "%{dsg_buy}%"
+			add 1 to {_setslot}
+		set {_setslot} to 6
+		loop 9 times:
+			if {_setslot} is 9:
+				set {_setslot} to 15
+			if {_setslot} is 18:
+				set {_setslot} to 24
+			set slot {_setslot} of arg-1's current inventory to green stained glass pane named "%{dsg_sell}%"
+			add 1 to {_setslot}
+
+command /dsspage [<text>] [<int>]:
+	trigger:
+		if arg-1 is "page":
+			if arg-2 is set:
+				sound(player, "block.chest.open")
+				open chest with 6 row named "%{dsg_title}% %{dsg_buy}%" to player
+				set {_setslot} to 45
+				loop 3 times:
+					set slot {_setslot} of player's current inventory to green stained glass pane named "%{dsg_backp}%"
+					add 1 to {_setslot}
+				set {_setslot} to 48
+				loop 3 times:
+					set slot {_setslot} of player's current inventory to red stained glass pane named "%{dsg_back}%"
+					add 1 to {_setslot}
+				set {_setslot} to 51
+				loop 3 times:
+					set slot {_setslot} of player's current inventory to green stained glass pane named "%{dsg_nextp}%"
+					add 1 to {_setslot}
+				set {_setslot} to 0
+				set {dsg.count1} to 1
+				set {_loop-index_count} to 0
+				set {_1} to 45 * arg-2
+				set {_2} to {_1} - 45
+				loop {dsg.item.data::*}:
+					if (loop-index parsed as an integer) is greater than or equal to {_2}:
+						add loop-value to {dsg.item.%player%::*}
+				loop {dsg.item.%player%::*}:
+					if {_setslot} is {_1}:
+						stop loop
+					set {_i1} to (loop-index parsed as an integer) + {_2}
+					set {_d} to {dsg.item.data::%{_i1}%}
+					set {_p} to {dsg.price::%{_i1}%}
+					set {_c} to {dsg.item.count::%{_i1}%}
+					set {_m} to {dsg.max::%{_i1}%}
+
+					set slot {_setslot} of player's current inventory to {_d} with lore "&f値段&7:&f%{_p}%EM" and "&f在庫&7:&a%{_c}%&7/&a%{_m}%"
+					add 1 to {_setslot}
+				delete {dsg.item.%player%::*}
+command /dss [<text>] [<int>] [<int>]:
+	permission: admin
+	trigger:
+		if player is in "build_world":
+			send "%{dsg_text}%" to player
+			stop
+		if arg-1 is "reload":
+			send "reloadします。"
+			execute player command "/sk reload department_store"
+		if arg-1 is "list":
+			send "%{dsg.item.data::*}%"
+			send "%{dsg.price::*}%"
+			send "%{dsg.max::*}%"
+		if arg-1 is "clear":
+			delete {dsg.item.data::*}
+			delete {dsg.price::*}
+			delete {dsg.max::*}
+			delete {dsg.item.count::*}
+			delete {dsg.count}
+		if arg-1 is "regen":
+			loop {dsg.count} times:
+				set {dsg.item.count::%loop-number%} to {dsg.max::%loop-number%} / 2
+		if arg-1 is "give":
+			if arg-2 is set:
+				give 1 of {dsg.item.data::1} to player
+				send "%{dsg.item.data::%arg-1%}% %{dsg.count}%"
+		if arg-1 is "add":
+			if arg-2 is set:
+				if arg-3 is set:
+					add 1 to {dsg.count}
+					set {dsg.item.data::%{dsg.count}%} to 1 of player's tool
+					set {dsg.price::%{dsg.count}%} to arg-2
+					set {dsg.n_price::%{dsg.count}%} to arg-2
+					set {dsg.max::%{dsg.count}%} to arg-3
+					set {dsg.item.count::%{dsg.count}%} to arg-3/2
+					#send "&aコマンド「/eim」で%{dsg.item.data::%{dsg.count}%}%を購入できるようになりました。" to players
+			else:
+				send "&c/dss add [金額] [最大値]"
+on inventory close:
+	if name of event-inventory is "%{dsg_title}% %{dsg_sell}%":
+		if {eim.money.1::%player%} is not 2:
+			delete {_money}
+			set {_s} to 0
+			loop inventory size of event-inventory - 9 times:
+				loop {dsg.count} times:
+					if slot {_s} of event-inventory is {dsg.item.data::%loop-number-2%}:
+						add {dsg.price::%loop-number-2%} * item amount of slot {_s} of event-inventory to {_money}
+						send "%{dsg.item.data::%loop-number-2%}%&f x %item amount of slot {_s} of event-inventory%&7:&f%{dsg.price::%loop-number-2%} * item amount of slot {_s} of event-inventory%EM" to player
+						set {_tram} to 1
+						set {_a} to item amount of slot {_s} of event-inventory
+						add {_a} to {dsg.item.count::%loop-number-2%}
+						set {_op} to {dsg.price::%loop-number-2%}
+						set {dsg.n_price::%loop-number-2%} to {dsg.n_price::%loop-number-2%} - 1 / {dsg.max::%loop-number-2%} * 50 * {_a}
+						set {dsg.price::%loop-number-2%} to round({dsg.n_price::%loop-number-2%})
+						if {_op} is not {dsg.price::%loop-number-2%}:
+							send "&a%{dsg.item.data::%loop-number-2%}%&aの値段が%{_op}%&aから%{dsg.price::%loop-number-2%}%&aになりました。&a"
+							create embed:
+								set the title of embed to "EmeraldItemManager"
+								set the description of embed to "%{dsg.item.data::%loop-number-2%}%の値段が%{_op}%から%{dsg.price::%loop-number-2%}%になりました。"
+								set the footer of embed to footer with text ""
+								set the timestamp of embed to now
+								set the color of embed to green
+							send the last created embed to channel with id "716185644669599744" with "eb"
+						create embed:
+							set the title of embed to "EmeraldItemManager"
+							set the description of embed to "%player%さんは%{_a}%個の%{dsg.item.data::%loop-number-2%}%を売却しました。"
+							set the footer of embed to footer with text ""
+							set the timestamp of embed to now
+							set the color of embed to green
+						send the last created embed to channel with id "716188249315475476" with "eb"
+						if {eq.id.eim_cobblestone_5000::%player%} is 1:
+							if 1 of {dsg.item.data::%loop-number-2%} is 1 of stone:
+								add {_a} to {eq.id.eim_cobblestone_5000.clear::%player%}
+				if {_tram} is not set:
+					give slot {_s} of event-inventory to player
+				add 1 to {_s}
+				delete {_tram}
+			delete {eim.money.1::%player%}
+			command "emc %player% add %{_money}%"
+		if {eim.money.1::%player%} is 2:
+			set {_s} to 0
+			loop inventory size of event-inventory - 9 times:
+				give slot {_s} of event-inventory to player
+				add 1 to {_s}
+			delete {eim.money.1::%player%}
+on inventory click:
+	if name of player's current inventory is {dsg_title}:
+		cancel event
+		if name of clicked item is "%{dsg_buy}%":
+			set {dsg_next_count::%player%} to 1
+			execute player command "/dsspage page 1"
+		if name of clicked item is "%{dsg_sell}%":
+			sound(player, "block.chest.open")
+			open chest with 6 row named "%{dsg_title}% %{dsg_sell}%" to player
+
+	if name of player's current inventory is "%{dsg_title}% %{dsg_sell}%":
+		if name of clicked item is "%{dsg_sell2}%":
+			cancel event
+			loop type of all items in player's current inventory:
+				set {_item_amount::%loop-value%} to amount of item in player's current inventory
+				add {dsg.price::%{dsg.item.type::%loop-value%}%} * {_item_amount::%loop-value%} to {_sell_price}
+			send "%{_sell_price}%"
+	if name of player's current inventory is "%{dsg_title}% %{dsg_buy}% &7| &a&lBuy":
+		if clicked item is {eim.buy.item::%player%} named "&aクリックで購入(%item amount of clicked item%個)":
+			cancel event
+			if player has enough space for {eim.buy.item::%player%}:
+				set {_a} to 1
+			if {_a} is 1:
+				if {dsg.item.count::%{eim.buy.id::%player%}%} is greater than or equal to (item amount of clicked item):
+					if ({balance::%player%} * item amount of clicked item) is greater than or equal to {dsg.price::%{eim.buy.id::%player%}%}:
+						command "emc %player% remove %{dsg.price::%{eim.buy.id::%player%}%} * item amount of clicked item%"
+						give (item amount of clicked item) of {eim.buy.item::%player%} to player
+						send "&a%item amount of clicked item%&a個の%{eim.buy.item::%player%}%&a購入しました。"
+						remove (item amount of clicked item) from {dsg.item.count::%{eim.buy.id::%player%}%}
+						set {_op} to {dsg.price::%{eim.buy.id::%player%}%}
+						set {dsg.n_price::%{eim.buy.id::%player%}%} to {dsg.n_price::%{eim.buy.id::%player%}%} + 1 / {dsg.max::%{eim.buy.id::%player%}%} * 50 * item amount of clicked item
+						set {dsg.price::%{eim.buy.id::%player%}%} to round({dsg.n_price::%{eim.buy.id::%player%}%})
+						if {_op} is not {dsg.price::%{eim.buy.id::%player%}%}:
+							send "&a%{eim.buy.item::%player%}%&aの値段が%{_op}%&aから%{dsg.price::%{eim.buy.id::%player%}%}%&aになりました。&a"
+							create embed:
+								set the title of embed to "EmeraldItemManager"
+								set the description of embed to "%{eim.buy.item::%player%}%の値段が%{_op}%から%{dsg.price::%{eim.buy.id::%player%}%}%になりました。"
+								set the footer of embed to footer with text ""
+								set the timestamp of embed to now
+								set the color of embed to green
+							send the last created embed to channel with id "716185644669599744" with "eb"
+						create embed:
+							set the title of embed to "EmeraldItemManager"
+							set the description of embed to "%player%さんは%item amount of clicked item%個の%{eim.buy.item::%player%}%を購入しました。"
+							set the footer of embed to footer with text ""
+							set the timestamp of embed to now
+							set the color of embed to green
+						send the last created embed to channel with id "716188249315475476" with "eb"
+						stop
+					else:
+						send "&cお金が足りません。"
+				else:
+					send "&c在庫がありません。"
+			else:
+				send "&cインベントリに空きがないので購入できませんでした。"
+		if clicked item is gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""&f&6所持金&7:&2&l%{balance::%player%}%EM""],Name:""&f&l＊&bお金の情報""}}":
+			cancel event
+	if name of player's current inventory is "%{dsg_title}% %{dsg_buy}%":
+		cancel event
+		if name of clicked item is "%{dsg_back}%":
+			command "/dsg %player%"
+			stop
+		if name of clicked item is "%{dsg_nextp}%":
+			add 1 to {dsg_next_count::%player%}
+			execute player command "/dsspage page %{dsg_next_count::%player%}%"
+			stop
+		if name of clicked item is "%{dsg_backp}%":
+			set {dsg_next_count::%player%} to {dsg_next_count::%player%} - 1
+			execute player command "/dsspage page %{dsg_next_count::%player%}%"
+			stop
+		loop {dsg.item.data::*}:
+			set {_i} to {dsg.item.data::%loop-index%}
+			if clicked item is {_i} with lore "&f値段&7:&f%{dsg.price::%loop-index%}%EM" and "&f在庫&7:&a%{dsg.item.count::%loop-index%}%&7/&a%{dsg.max::%loop-index%}%":
+				if type of clicked item is type of {_i}:
+					open chest with 3 row named "%{dsg_title}% %{dsg_buy}% &7| &a&lBuy" to player
+					set {_i2} to {dsg.item.data::%loop-index%}
+					set {eim.buy.item::%player%} to {dsg.item.data::%loop-index%}
+					set {eim.buy.id::%player%} to loop-index
+					set slot 0 of player's current inventory to gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""&f&6所持金&7:&2&l%{balance::%player%}%EM""],Name:""&f&l＊&bお金の情報""}}"
+					set slot 10 of player's current inventory to 1 of {_i2} named "&aクリックで購入(1個)"
+					set slot 11 of player's current inventory to 2 of {_i2} named "&aクリックで購入(2個)"
+					set slot 12 of player's current inventory to 4 of {_i2} named "&aクリックで購入(4個)"
+					set slot 13 of player's current inventory to 8 of {_i2} named "&aクリックで購入(8個)"
+					set slot 14 of player's current inventory to 16 of {_i2} named "&aクリックで購入(16個)"
+					set slot 15 of player's current inventory to 32 of {_i2} named "&aクリックで購入(32個)"
+					set slot 16 of player's current inventory to 64 of {_i2} named "&aクリックで購入(64個)"

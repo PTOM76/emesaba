@@ -1,0 +1,375 @@
+command /setloan [<player>] [<int>]:
+	permission: admin
+	trigger:
+		set {loan::%arg-1%} to arg-2
+#every minutes:
+#	loop all players:
+#		add 1 to {loantimeminutes::%loop-player%}
+#		if {loantimeminutes::%loop-player%} is greater than 60:
+#			if {loan::%loop-player%} is greater than 1:
+#				set {loantimeminutes::%loop-player%} to 0
+#				set {loan::%loop-player%} to {loan::%loop-player%} + 0.001 * {loan::%loop-player%}
+#				send "利子で借金が%{loan::%loop-player%}%になりました。(利子:0.1％)" to loop-player
+#			else:
+#				set {loantimeminutes::%loop-player%} to 0
+#				set {balance::%loop-player%} to {balance::%loop-player%} + 0.001 * {balance::%loop-player%}
+#				send "利息で所持金が%{balance::%loop-player%}%になりました。(利息:0.1％)" to loop-player
+command /loanfuck:
+	permission: admin
+	trigger:
+		delete {loan::*}
+command /loan [<offlineplayer>]:
+	trigger:
+		if arg-1 is set:
+			if {loan::%arg-1%} is set:
+				send "%arg-1%は&2%{loan::%arg-1%}%EM&fをATMで借金しています。" to player
+			else:
+				send "%arg-1%は借金をしていません。" to player
+		else:
+			if {loan::%player%} is set:
+				send "あなたは&2%{loan::%player%}%EM&fをATMで借金しています。" to player
+			else:
+				send "%player%は借金をしていません。" to player
+
+command /atm:
+	trigger:
+		if player is in "build_world":
+			send "建築サーバーでATMを開くことはできません。" to player
+			stop
+		open chest with 4 row named "&c&l&n&oATM" to player
+		set slot 0 of player's current inventory to white stained glass pane named " "
+		set slot 1 of player's current inventory to white stained glass pane named " "
+		set slot 2 of player's current inventory to white stained glass pane named " "
+		set slot 3 of player's current inventory to white stained glass pane named " "
+		set slot 4 of player's current inventory to white stained glass pane named " "
+		set slot 5 of player's current inventory to white stained glass pane named " "
+		set slot 6 of player's current inventory to white stained glass pane named " "
+		set slot 7 of player's current inventory to white stained glass pane named " "
+		set slot 8 of player's current inventory to white stained glass pane named " "
+		set slot 9 of player's current inventory to jukebox named "&6振り込み" with lore "&d仮想通貨に振り込む。"
+		set slot 10 of player's current inventory to jukebox named "&6振り込み" with lore "&d仮想通貨に振り込む。"
+		set slot 18 of player's current inventory to jukebox named "&6振り込み" with lore "&d仮想通貨に振り込む。"
+		set slot 19 of player's current inventory to jukebox named "&6振り込み" with lore "&d仮想通貨に振り込む。"
+		set slot 12 of player's current inventory to paper named "&6借金(Coming soon...)" with lore "&dEmeraldMoney社のATMから借金ができる。"
+		set slot 13 of player's current inventory to paper named "&6借金(Coming soon...)" with lore "&dEmeraldMoney社のATMから借金ができる。"
+		set slot 14 of player's current inventory to paper named "&6借金(Coming soon...)" with lore "&dEmeraldMoney社のATMから借金ができる。"
+		set slot 21 of player's current inventory to paper named "&6借金(Coming soon...)" with lore "&dEmeraldMoney社のATMから借金ができる。"
+		set slot 22 of player's current inventory to paper named "&6借金(Coming soon...)" with lore "&dEmeraldMoney社のATMから借金ができる。"
+		set slot 23 of player's current inventory to paper named "&6借金(Coming soon...)" with lore "&dEmeraldMoney社のATMから借金ができる。"
+		set slot 16 of player's current inventory to hopper named "&6引き出し" with lore "&d仮想通貨から引き出す。"
+		set slot 17 of player's current inventory to hopper named "&6引き出し" with lore "&d仮想通貨から引き出す。"
+		set slot 25 of player's current inventory to hopper named "&6引き出し" with lore "&d仮想通貨から引き出す。"
+		set slot 26 of player's current inventory to hopper named "&6引き出し" with lore "&d仮想通貨から引き出す。"
+		set slot 11 of player's current inventory to white stained glass pane named " "
+		set slot 15 of player's current inventory to white stained glass pane named " "
+		set slot 24 of player's current inventory to white stained glass pane named " "
+		set slot 20 of player's current inventory to white stained glass pane named " "
+		set slot 27 of player's current inventory to white stained glass pane named " "
+		set slot 28 of player's current inventory to white stained glass pane named " "
+		set slot 29 of player's current inventory to white stained glass pane named " "
+		set slot 30 of player's current inventory to white stained glass pane named " "
+		set slot 31 of player's current inventory to white stained glass pane named " "
+		set slot 32 of player's current inventory to white stained glass pane named " "
+		set slot 33 of player's current inventory to white stained glass pane named " "
+		set slot 34 of player's current inventory to white stained glass pane named " "
+		set slot 35 of player's current inventory to white stained glass pane named " "
+on rightclick with gold ingot:
+	if lore of event-item contains "EMの現金である。":
+		execute player command "/atm"
+on rightclick with emerald:
+	if lore of event-item contains "EMの現金である。":
+		execute player command "/atm"
+on inventory click:
+	if name of player's current inventory is "&c&l&n&oATM":
+		cancel event
+		if name of clicked item is "&6振り込み":
+			open chest with 6 row named "&6振り込み|&c&l&n&oATM" to player
+			set {_s} to 45
+			loop 3 times:
+				set slot {_s} of player's current inventory to red stained glass pane named "&cキャンセル(Cancel)"
+				add 1 to {_s}
+			loop 3 times:
+				set slot {_s} of player's current inventory to green stained glass pane named "&a振り込む(Transfer)" with lore "&fATMを閉じても振り込めます。"
+				add 1 to {_s}
+			loop 3 times:
+				set slot {_s} of player's current inventory to red stained glass pane named "&cキャンセル(Cancel)"
+				add 1 to {_s}
+		if name of clicked item is "&6借金":
+			set {number_loan::%player%} to 0
+			open chest with 6 row named "&6借金|&c&l&n&oATM" to player
+			set slot 0 of player's current inventory to gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""&f&6所持金&7:&2&l%{balance::%player%}%EM"",""&c借金&7:&2&l%{loan::%player%}%EM""],Name:""&f&l＊&bお金の情報""}}"
+			set slot 1 of player's current inventory to player head with nbt "{display:{Name:""&6&l0"",Lore:[""&fクリックして「0」を入力""]},SkullOwner:{Id:""d64b2db2-918b-4a47-b024-baca7a75b822"",Properties:{textures:[{Value:""eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2JmZjgyMTFlM2Q5ZDE2YjRjYTJjMjBjZDJhNmY5OWNjZThmZTRkOThlZjVjYTU1MTZmNTFmMjVjZjFjMzEifX19""}]}}}"
+			set slot 2 of player's current inventory to player head with nbt "{display:{Name:""&6&l1"",Lore:[""&fクリックして「1」を入力""]},SkullOwner:{Id:""f6db7588-352e-4074-86a8-4f58e2a8a74e"",Properties:{textures:[{Value:""eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTBhMTllMjNkMjFmMmRiMDYzY2M1NWU5OWFlODc0ZGM4YjIzYmU3NzliZTM0ZTUyZTdjN2I5YTI1In19fQ==""}]}}}"
+			set slot 3 of player's current inventory to player head with nbt "{display:{Name:""&6&l2"",Lore:[""&fクリックして「2」を入力""]},SkullOwner:{Id:""517901d5-c5bc-4c07-a3f0-a0537d190f14"",Properties:{textures:[{Value:""eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2M1OTZhNDFkYWVhNTFiZTJlOWZlYzdkZTJkODkwNjhlMmZhNjFjOWQ1N2E4YmRkZTQ0YjU1OTM3YjYwMzcifX19""}]}}}"
+			set slot 4 of player's current inventory to player head with nbt "{display:{Name:""&6&l3"",Lore:[""&fクリックして「3」を入力""]},SkullOwner:{Id:""b83b4f82-fad3-426f-a91d-e9325a5b39dd"",Properties:{textures:[{Value:""eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjg1ZDRmZGE1NmJmZWI4NTEyNDQ2MGZmNzJiMjUxZGNhOGQxZGViNjU3ODA3MGQ2MTJiMmQzYWRiZjVhOCJ9fX0=""}]}}}"
+			set slot 5 of player's current inventory to player head with nbt "{display:{Name:""&6&l4"",Lore:[""&fクリックして「4」を入力""]},SkullOwner:{Id:""e3e876f9-2bc2-42a8-b480-4eaf0a00e803"",Properties:{textures:[{Value:""eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzg1MmEyNWZlNjljYTg2ZmI5ODJmYjNjYzdhYzk3OTNmNzM1NmI1MGI5MmNiMGUxOTNkNmI0NjMyYTliZDYyOSJ9fX0=""}]}}}"
+			set slot 10 of player's current inventory to player head with nbt "{display:{Name:""&6&l5"",Lore:[""&fクリックして「5」を入力""]},SkullOwner:{Id:""c535d7f1-931e-4fab-a4f1-1f67e6ed868d"",Properties:{textures:[{Value:""eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzRlZTdkOTU0ZWIxNGE1Y2NkMzQ2MjY2MjMxYmY5YTY3MTY1MjdiNTliYmNkNzk1NmNlZjA0YTlkOWIifX19""}]}}}"
+			set slot 11 of player's current inventory to player head with nbt "{display:{Name:""&6&l6"",Lore:[""&fクリックして「6」を入力""]},SkullOwner:{Id:""919f6697-ac07-41a2-90b4-1fc14c3afe48"",Properties:{textures:[{Value:""eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjY4MmEzYWU5NDgzNzRlMDM3ZTNkN2RkNjg3ZDU5ZDE4NWRkMmNjOGZjMDlkZmViNDJmOThmOGQyNTllNWMzIn19fQ==""}]}}}"
+			set slot 12 of player's current inventory to player head with nbt "{display:{Name:""&6&l7"",Lore:[""&fクリックして「7」を入力""]},SkullOwner:{Id:""8b614d52-9a8c-4780-9f31-2021fc06aa4f"",Properties:{textures:[{Value:""eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGVhMzBjMjRjNjBiM2JjMWFmNjU4ZWY2NjFiNzcxYzQ4ZDViOWM5ZTI4MTg4Y2Y5ZGU5ZjgzMjQyMmU1MTAifX19""}]}}}"
+			set slot 13 of player's current inventory to player head with nbt "{display:{Name:""&6&l8"",Lore:[""&fクリックして「8」を入力""]},SkullOwner:{Id:""ef959987-ff3f-44f5-8a0a-07ac776832fa"",Properties:{textures:[{Value:""eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjZhYmFmZDAyM2YyMzBlNDQ4NWFhZjI2ZTE5MzY4ZjU5ODBkNGYxNGE1OWZjYzZkMTFhNDQ2Njk5NDg5MiJ9fX0=""}]}}}"
+			set slot 14 of player's current inventory to player head with nbt "{display:{Name:""&6&l9"",Lore:[""&fクリックして「9」を入力""]},SkullOwner:{Id:""fcc24a38-ef01-435a-a55d-e32451353e44"",Properties:{textures:[{Value:""eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGQ3OTEwZTEwMzM0Zjg5MGE2MjU0ODNhYzBjODI0YjVlNGExYTRiMTVhOTU2MzI3YTNlM2FlNDU4ZDllYTQifX19""}]}}}"
+			set slot 7 of player's current inventory to player head with nbt "{display:{Name:""&6&lDelete"",Lore:[""&fクリックして直前の1字を削除""]},SkullOwner:{Id:""4d35f021-81b6-44ee-a711-8d8462174124"",Properties:{textures:[{Value:""eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWYxMzNlOTE5MTlkYjBhY2VmZGMyNzJkNjdmZDg3YjRiZTg4ZGM0NGE5NTg5NTg4MjQ0NzRlMjFlMDZkNTNlNiJ9fX0=""}]}}}"
+			set slot 31 of player's current inventory to paper with nbt "{display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+			set slot 53 of player's current inventory to blue stained glass pane named "&9&l確認"
+			set slot 51 of player's current inventory to red stained glass pane named "&2&l返済"
+			set slot 45 of player's current inventory to knowledge book named "&d&l&n&o説明&f" with lore "&f利子はサーバーに入っている限り1時間で&40.1％&fずつ増える。" , "&f早めに借金返済した方が良さそうだ。" , "&f借金をすると所持金に加算される。" , "&f期限は無限であるが利息がなくなり利子が加算されてしまう。" , "&f/loanで自分の借金が確認でき、/loan [プレイヤー名]で他人の借金が見れる。"
+		if name of clicked item is "&6引き出し":
+			open chest with 3 row named "&6引き出し|&c&l&n&oATM" to player
+			set slot 0 of player's current inventory to gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""1EMの現金である。"",""&f&6所持金&7:&2&l%{balance::%player%}%EM""],Name:""1EM""}}"
+			set slot 1 of player's current inventory to gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""10EMの現金である。"",""&f&6所持金&7:&2&l%{balance::%player%}%EM""],Name:""10EM""}}"
+			set slot 2 of player's current inventory to gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""100EMの現金である。"",""&f&6所持金&7:&2&l%{balance::%player%}%EM""],Name:""100EM""}}"
+			set slot 3 of player's current inventory to gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""1,000EMの現金である。"",""&f&6所持金&7:&2&l%{balance::%player%}%EM""],Name:""1,000EM""}}"
+			set slot 4 of player's current inventory to gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""10,000EMの現金である。"",""&f&6所持金&7:&2&l%{balance::%player%}%EM""],Name:""10,000EM""}}"
+			set slot 5 of player's current inventory to gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""100,000EMの現金である。"",""&f&6所持金&7:&2&l%{balance::%player%}%EM""],Name:""100,000EM""}}"
+			set slot 6 of player's current inventory to gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""1,000,000EMの現金である。"",""&f&6所持金&7:&2&l%{balance::%player%}%EM""],Name:""1,000,000EM""}}"
+			set slot 7 of player's current inventory to gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""10,000,000EMの現金である。"",""&f&6所持金&7:&2&l%{balance::%player%}%EM""],Name:""10,000,000EM""}}"
+			set slot 8 of player's current inventory to emerald with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""§f100,000,000EMの現金である。"",""&f&6所持金&7:&2&l%{balance::%player%}%EM""],Name:""100,000,000EM""}}"
+	if name of player's current inventory is "&6振り込み|&c&l&n&oATM":
+		if name of clicked item is "&cキャンセル(Cancel)":
+			cancel event
+			set {transfer.money.1::%player%} to 2
+			close player's inventory
+			stop
+		if name of clicked item is "&a振り込む(Transfer)":
+			cancel event
+			set {transfer.money.1::%player%} to 1
+			close player's inventory
+			stop
+	if name of player's current inventory contain "&9&l確認&r|&c&l&6借金":
+		cancel event
+		if name of clicked item is "&9&l決定":
+			add {number_loanc::%player%} to {loan::%player%}
+			add {number_loanc::%player%} to {balance::%player%}
+			close player's inventory
+			send "&2%{number_loanc::%player%}%EM&fを借金しました。借金は「/loan」で確認できます。" to player
+			set {number_loanc::%player%} to 0
+		if name of clicked item is "&c&lキャンセル":
+			close player's inventory
+	if name of player's current inventory contain "&6借金|&c&l&n&oATM":
+		if name of clicked item is "&2&l返済":
+			set {number_loanc::%player%} to {number_loan::%player%} parsed as an integer
+			if {number_loanc::%player%} is greater than {loan::%player%}:
+				send "&2&l返済に失敗しました。" , "&c借金している数より返済する量が大きいです。&f" to player
+			else:
+				remove {number_loanc::%player%} from {loan::%player%}
+				command "emc %player% remove %{number_loanc::%player%}%"
+				close player's inventory
+		if name of clicked item is "&9&l確認":
+			set {number_loanc::%player%} to {number_loan::%player%} parsed as an integer
+			if {number_loanc::%player%} is greater than 0:
+				open chest with 3 row named "&9&l確認&r|&c&l&6借金" to player
+				set slot 0 of player's current inventory to gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""&f&6所持金&7:&2&l%{balance::%player%}%EM"",""&c借金&7:&2&l%{loan::%player%}%EM""],Name:""&f&l＊&bお金の情報""}}"
+				set slot 9 of player's current inventory to paper with nbt "{display:{Name:""&c借金&7:&2%{number_loanc::%player%}%EM""}}"
+				set slot 2 of player's current inventory to green stained glass pane with nbt "{display:{Name:""&9&l決定""}}"
+				set slot 3 of player's current inventory to green stained glass pane with nbt "{display:{Name:""&9&l決定""}}"
+				set slot 4 of player's current inventory to green stained glass pane with nbt "{display:{Name:""&9&l決定""}}"
+				set slot 11 of player's current inventory to green stained glass pane with nbt "{display:{Name:""&9&l決定""}}"
+				set slot 12 of player's current inventory to green stained glass pane with nbt "{display:{Name:""&9&l決定""}}"
+				set slot 13 of player's current inventory to green stained glass pane with nbt "{display:{Name:""&9&l決定""}}"
+				set slot 20 of player's current inventory to green stained glass pane with nbt "{display:{Name:""&9&l決定""}}"
+				set slot 21 of player's current inventory to green stained glass pane with nbt "{display:{Name:""&9&l決定""}}"
+				set slot 22 of player's current inventory to green stained glass pane with nbt "{display:{Name:""&9&l決定""}}"
+				set slot 6 of player's current inventory to red stained glass pane with nbt "{display:{Name:""&c&lキャンセル""}}"
+				set slot 7 of player's current inventory to red stained glass pane with nbt "{display:{Name:""&c&lキャンセル""}}"
+				set slot 8 of player's current inventory to red stained glass pane with nbt "{display:{Name:""&c&lキャンセル""}}"
+				set slot 15 of player's current inventory to red stained glass pane with nbt "{display:{Name:""&c&lキャンセル""}}"
+				set slot 16 of player's current inventory to red stained glass pane with nbt "{display:{Name:""&c&lキャンセル""}}"
+				set slot 17 of player's current inventory to red stained glass pane with nbt "{display:{Name:""&c&lキャンセル""}}"
+				set slot 24 of player's current inventory to red stained glass pane with nbt "{display:{Name:""&c&lキャンセル""}}"
+				set slot 25 of player's current inventory to red stained glass pane with nbt "{display:{Name:""&c&lキャンセル""}}"
+				set slot 26 of player's current inventory to red stained glass pane with nbt "{display:{Name:""&c&lキャンセル""}}"
+				set slot 1 of player's current inventory to gray stained glass pane with nbt "{display:{Name:"" ""}}"
+				set slot 10 of player's current inventory to gray stained glass pane with nbt "{display:{Name:"" ""}}"
+				set slot 5 of player's current inventory to gray stained glass pane with nbt "{display:{Name:"" ""}}"
+				set slot 14 of player's current inventory to gray stained glass pane with nbt "{display:{Name:"" ""}}"
+				set slot 19 of player's current inventory to gray stained glass pane with nbt "{display:{Name:"" ""}}"
+				set slot 23 of player's current inventory to gray stained glass pane with nbt "{display:{Name:"" ""}}"
+			else:
+				stop
+		if name of clicked item is "&6&l0":
+			if {number_loan::%player%} is 0:
+				stop
+			set {number_loan::%player%} to "%{number_loan::%player%}%0"
+			set slot 31 of player's current inventory to paper with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+			wait 10 ticks
+			set slot 31 of player's current inventory to paper with nbt "{display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+		if name of clicked item is "&6&l1":
+			if {number_loan::%player%} is 0:
+				set {number_loan::%player%} to "1"
+			else:
+				set {number_loan::%player%} to "%{number_loan::%player%}%1"
+			set slot 31 of player's current inventory to paper with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+			wait 10 ticks
+			set slot 31 of player's current inventory to paper with nbt "{display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+		if name of clicked item is "&6&l2":
+			if {number_loan::%player%} is 0:
+				set {number_loan::%player%} to "2"
+			else:
+				set {number_loan::%player%} to "%{number_loan::%player%}%2"
+			set slot 31 of player's current inventory to paper with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+			wait 10 ticks
+			set slot 31 of player's current inventory to paper with nbt "{display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+		if name of clicked item is "&6&l3":
+			if {number_loan::%player%} is 0:
+				set {number_loan::%player%} to "3"
+			else:
+				set {number_loan::%player%} to "%{number_loan::%player%}%3"
+			set slot 31 of player's current inventory to paper with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+			wait 10 ticks
+			set slot 31 of player's current inventory to paper with nbt "{display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+		if name of clicked item is "&6&l4":
+			if {number_loan::%player%} is 0:
+				set {number_loan::%player%} to "4"
+			else:
+				set {number_loan::%player%} to "%{number_loan::%player%}%4"
+			set slot 31 of player's current inventory to paper with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+			wait 10 ticks
+			set slot 31 of player's current inventory to paper with nbt "{display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+		if name of clicked item is "&6&l5":
+			if {number_loan::%player%} is 0:
+				set {number_loan::%player%} to "5"
+			else:
+				set {number_loan::%player%} to "%{number_loan::%player%}%5"
+			set slot 31 of player's current inventory to paper with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+			wait 10 ticks
+			set slot 31 of player's current inventory to paper with nbt "{display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+		if name of clicked item is "&6&l6":
+			if {number_loan::%player%} is 0:
+				set {number_loan::%player%} to "6"
+			else:
+				set {number_loan::%player%} to "%{number_loan::%player%}%6"
+			set slot 31 of player's current inventory to paper with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+			wait 10 ticks
+			set slot 31 of player's current inventory to paper with nbt "{display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+		if name of clicked item is "&6&l7":
+			if {number_loan::%player%} is 0:
+				set {number_loan::%player%} to "7"
+			else:
+				set {number_loan::%player%} to "%{number_loan::%player%}%7"
+			set slot 31 of player's current inventory to paper with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+			wait 10 ticks
+			set slot 31 of player's current inventory to paper with nbt "{display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+		if name of clicked item is "&6&l8":
+			if {number_loan::%player%} is 0:
+				set {number_loan::%player%} to "8"
+			else:
+				set {number_loan::%player%} to "%{number_loan::%player%}%8"
+			set slot 31 of player's current inventory to paper with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+			wait 10 ticks
+			set slot 31 of player's current inventory to paper with nbt "{display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+		if name of clicked item is "&6&l9":
+			if {number_loan::%player%} is 0:
+				set {number_loan::%player%} to "9"
+			else:
+				set {number_loan::%player%} to "%{number_loan::%player%}%9"
+			set slot 31 of player's current inventory to paper with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+			wait 10 ticks
+			set slot 31 of player's current inventory to paper with nbt "{display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+		if name of clicked item is "&6&lDelete":
+			set {number_loanc::%player%} to {number_loan::%player%} parsed as an integer
+			if {number_loanc::%player%} is 0:
+				stop
+			else:
+				if {number_loanc::%player%} is less than 9:
+					set {number_loan::%player%} to 0
+				else:
+					set {number_loan::%player%} to first (length of {number_loan::%player%} - 1) characters of {number_loan::%player%}
+				
+			set slot 31 of player's current inventory to paper with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+			wait 10 ticks
+			set slot 31 of player's current inventory to paper with nbt "{display:{Name:""&c借金&7:&2%{number_loan::%player%}%EM""}}"
+
+	if name of player's current inventory contain "&6引き出し|&c&l&n&oATM":
+		set {_clicktype} to "%click type%"
+		if {_clicktype} contains "left":
+			set {_emcount} to 1
+		if {_clicktype} contains "shift" and "left":
+			set {_emcount} to 64
+		if name of clicked item is "1EM":
+			cancel event
+			command "/emc %player% change2 1 %{_emcount}%"
+		if name of clicked item is "10EM":
+			cancel event
+			command "/emc %player% change2 10 %{_emcount}%"
+		if name of clicked item is "100EM":
+			cancel event
+			command "/emc %player% change2 100 %{_emcount}%"
+		if name of clicked item is "1,000EM":
+			cancel event
+			command "/emc %player% change2 1000 %{_emcount}%"
+		if name of clicked item is "10,000EM":
+			cancel event
+			command "/emc %player% change2 10000 %{_emcount}%"
+		if name of clicked item is "100,000EM":
+			cancel event
+			command "/emc %player% change2 100000 %{_emcount}%"
+		if name of clicked item is "1,000,000EM":
+			cancel event
+			command "/emc %player% change2 1000000 %{_emcount}%"
+		if name of clicked item is "10,000,000EM":
+			cancel event
+			command "/emc %player% change2 10000000 %{_emcount}%"
+		if name of clicked item is "100,000,000EM":
+			cancel event
+			command "/emc %player% change2 100000000 %{_emcount}%"
+on inventory close:
+	if name of event-inventory is "&6振り込み|&c&l&n&oATM":
+		if {transfer.money.1::%player%} is not 2:
+			delete {_money}
+			set {_s} to 0
+			loop inventory size of event-inventory - 9 times:
+				loop {ememoney.type.amount} times:
+					if slot {_s} of event-inventory is {ememoney.%loop-number-2%}:
+						add {ememoney.%loop-number-2%.value} * item amount of slot {_s} of event-inventory to {_money}
+						send "%{ememoney.%loop-number-2%.name}%&f x %item amount of slot {_s} of event-inventory%&7:&f%{ememoney.%loop-number-2%.value} * item amount of slot {_s} of event-inventory%EM" to player
+						set {_tram} to 1
+				if {_tram} is not set:
+					give slot {_s} of event-inventory to player
+				add 1 to {_s}
+				delete {_tram}
+			delete {transfer.money.1::%player%}
+			command "emc %player% add %{_money}%"
+		if {transfer.money.1::%player%} is 2:
+			set {_s} to 0
+			loop inventory size of event-inventory - 9 times:
+				give slot {_s} of event-inventory to player
+				add 1 to {_s}
+			delete {transfer.money.1::%player%}
+on load:
+	set {ememoney.type.amount} to 12
+	set {ememoney.1.name} to "1EM"
+	set {ememoney.2.name} to "10EM"
+	set {ememoney.3.name} to "100EM"
+	set {ememoney.4.name} to "1,000EM"
+	set {ememoney.5.name} to "10,000EM"
+	set {ememoney.6.name} to "100,000EM"
+	set {ememoney.7.name} to "1,000,000EM"
+	set {ememoney.8.name} to "10,000,000EM"
+	set {ememoney.9.name} to "100,000,000EM"
+	set {ememoney.10.name} to "1,000,000,000EM"
+	set {ememoney.11.name} to "10,000,000,000EM"
+	set {ememoney.12.name} to "100,000,000,000EM"
+	set {ememoney.1.value} to 1
+	set {ememoney.2.value} to 10
+	set {ememoney.3.value} to 100
+	set {ememoney.4.value} to 1000
+	set {ememoney.5.value} to 10000
+	set {ememoney.6.value} to 100000
+	set {ememoney.7.value} to 1000000
+	set {ememoney.8.value} to 10000000
+	set {ememoney.9.value} to 100000000
+	set {ememoney.10.value} to 1000000000
+	set {ememoney.11.value} to 10000000000
+	set {ememoney.12.value} to 100000000000
+	set {ememoney.1} to gold ingot named "%{ememoney.1.name}%" with lore "%{ememoney.1.name}%の現金である。" with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1}"
+	set {ememoney.2} to gold ingot named "%{ememoney.2.name}%" with lore "%{ememoney.2.name}%の現金である。" with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1}"
+	set {ememoney.3} to gold ingot named "%{ememoney.3.name}%" with lore "%{ememoney.3.name}%の現金である。" with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1}"
+	set {ememoney.4} to gold ingot named "%{ememoney.4.name}%" with lore "%{ememoney.4.name}%の現金である。" with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1}"
+	set {ememoney.5} to gold ingot named "%{ememoney.5.name}%" with lore "%{ememoney.5.name}%の現金である。" with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1}"
+	set {ememoney.6} to gold ingot named "%{ememoney.6.name}%" with lore "%{ememoney.6.name}%の現金である。" with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1}"
+	set {ememoney.7} to gold ingot named "%{ememoney.7.name}%" with lore "%{ememoney.7.name}%の現金である。" with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1}"
+	set {ememoney.8} to gold ingot named "%{ememoney.8.name}%" with lore "%{ememoney.8.name}%の現金である。" with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1}"
+	set {ememoney.9} to emerald named "%{ememoney.9.name}%" with lore "%{ememoney.9.name}%の現金である。" with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1}"
+	set {ememoney.10} to paper named "§f%{ememoney.10.name}%" with lore "§f%{ememoney.10.name}%の現金である。" with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1}"
+	set {ememoney.11} to paper named "§f%{ememoney.11.name}%" with lore "§f%{ememoney.11.name}%の現金である。" with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1}"
+	set {ememoney.12} to paper named "§f%{ememoney.12.name}%" with lore "§f%{ememoney.12.name}%の現金である。" with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1}"

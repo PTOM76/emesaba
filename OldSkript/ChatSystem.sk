@@ -1,0 +1,69 @@
+#Create by arufo3813,arufo1338
+#二次配布改造禁止
+command /message2 [<text>] [<text>] [<offline player>]:
+	permission: sk.admin
+	permission message: &c&l貴方には権限がありません!!
+	trigger:
+		if arg-1 is not set:
+			send "&b&l/message2 help"
+		if arg-1 is "broadcast":
+			if colored arg-2 is set:
+				broadcast "%colored arg-2%"
+		if arg-1 is "send":
+			if colored arg-2 is set:
+				console command "/tellraw %arg-3% %colored arg-2%" 
+		if arg-1 is "help":
+			send "&a&l=-=-=-=-=-=-=&b&l[Message-Help]&a&l=-=-=-=-=-=-=-="
+			send "&e&l・/message2 broadcast <text>"
+			send "&e&l・/message2 send <text> <player>"
+			send "&e&l-sendはtextをクオーテーションで囲んでください。"
+			send "&a&l=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+command /chat [<text>]:
+	aliases: ch,chatsystem
+	permission: sk.admin
+	permission message: "&c&l貴方には権限がありません!!"
+	trigger:
+		if arg-1 is "admin":
+			set {adminchat.%player%} to true
+			send "&e&l[ChatSystem]&c&lAdminChatに設定しました。"
+			set {chat.%player%} to "&c&lAdminChat"
+		if arg-1 is "server":
+			set {adminchat.%player%} to false
+			send "&e&l[ChatSystem]&a&lServerChatに設定しました。"
+			set {chat.%player%} to "&a&lServerChat"
+		if arg-1 is "info":
+			send "&e&l[ChatSystem]&b&lInfo: %{chat.%player%}%"
+		if arg-1 is "log":
+			if {log.chat} is 0:
+				send "&e&l[ChatSystem]&a&lLogはありません。"
+			else:
+				set {chat.log} to 1
+				loop {log.chat} times:
+					message "%{chat::%{chat.log}%}%"
+					add 1 to {chat.log}
+		if arg-1 is "resetlog":
+			message "&e&l[ChatSystem]&c&lLogをリセットしました。"
+			set {log.chat} to 0
+		if arg-1 is "creater":
+			send "&e&l[ChatSystem]&2&lCreate by arufo3813,arufo1338"
+		if arg-1 is not set:
+			send "&e&l[ChatSystem]&b&l/chat help"
+		if arg-1 is "help":
+			send "&b&l=-=-=-=-=&e&l[ChatSystem-help]&b&l=-=-=-=-=-=-=-=-=-=-="
+			send "&a&l・/chat admin"
+			send "&a&l・/chat server"
+			send "&a&l・/chat info"
+			send "&a&l・/chat log"
+			send "&a&l・/chat resetlog"
+			send "&a&l・/chat creater"
+			send "&a&l-Serverを抜けるとChatがServerに設定されます。"
+			send "&b&l=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+on chat:
+	add 1 to {log.chat}
+	set {chat::%{log.chat}%} to "&f&l%player%&a: &r%message% &e&l[%now%]"
+	if {adminchat.%player%} is true:
+		cancel event
+		send "&c&l[AdminChat]&r%player%&a: &r%message%" to all ops
+on join:
+	set {adminchat.%player%} to false
+	set {chat.%player%} to "&a&lServerChat"

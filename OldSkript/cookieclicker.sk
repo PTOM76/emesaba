@@ -1,0 +1,59 @@
+on rightclick:
+	if player is holding cookie named "&r&6&lクッキークリッカー" with nbt "{HideFlags:1,ench:[{id:32,lvl:1}]}":
+		cancel event
+		cookieClickerGui(player)
+		stop
+function cookieClickerGui(p: player):
+	if {cookieclicker.auto.cursor::%{_p}%} is not set:
+		set {cookieclicker.auto.cursor::%{_p}%} to 0
+	if {cookieclicker.cookies::%{_p}%} is not set:
+		set {cookieclicker.cookies::%{_p}%} to 0
+	if {cookieclicker.click.add.cookies::%{_p}%} is not set:
+		set {cookieclicker.click.add.cookies::%{_p}%} to 1
+	open chest with 6 row named "&rクッキー:%{cookieclicker.cookies::%{_p}%}% &r&6&lクッキークリッカー" to {_p}
+	set slot 10 of {_p}'s current inventory to cookie named "&r&6&l[Click]" with lore "" and "&fクッキー:%{cookieclicker.cookies::%{_p}%}%"
+	set slot 45 of {_p}'s current inventory to cookie named "&fオートカーソル &d%{cookieclicker.auto.cursor::%{_p}%}%" with lore "&f自動でクッキーをクリックすることができる。"
+	loop 3 times:
+		set slot ((loop-number - 1) * 9 + 3) of {_p}'s current inventory to gray glass pane named " "
+	loop 4 times:
+		set slot (loop-number + 26) of {_p}'s current inventory to gray glass pane named " "
+command /ccclear:
+	permission: admin
+	trigger:
+		set {cookieclicker.auto.cursor::%player%} to 0
+		set {cookieclicker.cookies::%player%} to 0
+		set {cookieclicker.click.add.cookies::%player%} to 1
+command /cookieclickeritem:
+	permission: admin
+	trigger:
+		give cookie named "&r&6&lクッキークリッカー" with nbt "{HideFlags:1,ench:[{id:32,lvl:1}]}" to player
+on inventory click:
+	if name of player's current inventory contains " &r&6&lクッキークリッカー":
+		cancel event
+		if clicked item is cookie named "&r&6&l[Click]" with lore "" and "&fクッキー:%{cookieclicker.cookies::%player%}%":
+			add {cookieclicker.click.add.cookies::%player%} to {cookieclicker.cookies::%player%}
+			cookieClickerGui(player)
+			stop
+		if name of clicked item contains "&fオートカーソル &d":
+			if {cookieclicker.cookies::%player%} is greater than ({cookieclicker.auto.cursor::%player%} * 4 + 1):
+				#set {_n} to name of clicked item
+				#replace all "&fオートカーソル &d" with "" in {_n}
+				#set {_n} to {_n} parsed as integer
+				#if {_n} is 0:
+				#	set {_n} to 1
+				#else:
+				#	set {_n} to round(1 + {_n}/16)
+				remove ({cookieclicker.auto.cursor::%player%} * 4) from {cookieclicker.cookies::%player%}
+				add 1 to {cookieclicker.auto.cursor::%player%}
+				cookieClickerGui(player)
+			else:
+				send "&cクッキーが%{cookieclicker.auto.cursor::%player%} * 4 + 2%&c個以上必要です。"
+
+			stop
+every seconds:
+	loop all players:
+		if name of loop-player's current inventory contains " &r&6&lクッキークリッカー":
+			if {cookieclicker.auto.cursor::%loop-player%} is not 0:
+				add {cookieclicker.auto.cursor::%loop-player%} to {cookieclicker.cookies::%loop-player%}
+				cookieClickerGui(loop-player)
+				stop

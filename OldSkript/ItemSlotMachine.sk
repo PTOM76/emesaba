@@ -1,0 +1,1020 @@
+on load:
+	set {text1::slotmachine} to "&c同時にスロットを回すことはできません。"
+	set {coinnbt::slotmachine} to "{display:{Name:""§6§k§l1§e§l§n§oCasino slot coin§6§k§l1§f"",Lore:[""§e§lスロット§fで使うことができるコイン"",""§f10,000EMの価値がある。""]}}"
+
+on rightclick on jukebox:
+	loop all entities in radius 4 of player:
+		if name of loop-entity is "sm1":
+			if player is holding 1 of magma cream with nbt "%{coinnbt::slotmachine}%":
+				if {playcrs::%player%} is 1:
+					send "%{text1::slotmachine}%" to player
+					stop
+				else:
+					set {sm1_x} to loop-entity's x-coordinate + -0.5
+					set {sm1_y} to loop-entity's y-coordinate + 1.5
+					set {sm1_z} to loop-entity's z-coordinate + -1.5
+					set {sm1_locations_number} to "%{sm1_x}%%{sm1_y}%%{sm1_z}%"
+					set {playcrs::%player%} to 1
+					remove magma cream with nbt "%{coinnbt::slotmachine}%" from player's inventory
+					add 5000 to {stock::%{sm1_locations_number}%}
+					command "/blockdata %{sm1_x}% %{sm1_y} + 1% %{sm1_z}% {Text1:""{\""text\"":\""====================\""}"",Text2:""[\""\"",{\""text\"":\""\\u8349\\u30b9\\u30ed\\u30c3\\u30c8 \""},{\""text\"":\""1\\u56de\"",\""color\"":\""black\""},{\""text\"":\""1\"",\""color\"":\""blue\""},{\""text\"":\""Cc\"",\""color\"":\""black\""}]"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{stock::%{sm1_locations_number}%}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+					set {crstime::%player%} to random integer between 15 and 20
+					set {_grassslots} to 1
+					loop {crstime::%player%} time:
+						command "playsound block.grass.break player @a %{sm1_x}% %{sm1_y}% %{sm1_z}% 0.5 1"
+						loop 3 time:
+							if {_grassslots} is 4:
+								set {_grassslots} to 1
+							set {casino_random_slot%{_grassslots}%::%player%} to random integer between 1 and 4
+							if {casino_random_slot%{_grassslots}%::%player%} is 1:
+								set {_item::grassslot%{_grassslots}%} to "grass"
+								set {_damage::grassslot%{_grassslots}%} to 0
+							if {casino_random_slot%{_grassslots}%::%player%} is 2:
+								set {_item::grassslot%{_grassslots}%} to "deadbush"
+								set {_damage::grassslot%{_grassslots}%} to 0
+							if {casino_random_slot%{_grassslots}%::%player%} is 3:
+								set {_item::grassslot%{_grassslots}%} to "tallgrass"
+								set {_damage::grassslot%{_grassslots}%} to 1
+							if {casino_random_slot%{_grassslots}%::%player%} is 4:
+								set {_item::grassslot%{_grassslots}%} to "double_plant"
+								set {_damage::grassslot%{_grassslots}%} to 2
+							add 1 to {_grassslots}
+						command "entitydata @e[type=item_frame,x=%{sm1_x} - 1%,y=%{sm1_y}%,z=%{sm1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::grassslot1}%"",Damage:%{_damage::grassslot1}%s}}"
+						command "entitydata @e[type=item_frame,x=%{sm1_x}%,y=%{sm1_y}%,z=%{sm1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::grassslot2}%"",Damage:%{_damage::grassslot2}%s}}"
+						command "entitydata @e[type=item_frame,x=%{sm1_x} + 1%,y=%{sm1_y}%,z=%{sm1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::grassslot3}%"",Damage:%{_damage::grassslot3}%s}}"
+						wait 5 tick
+					set {_grassslotp} to random integer between 1 and 8
+					if {_grassslotp} is 4:
+						set {_casino_random_slot_happy} to random integer between 1 and 4
+						if {_casino_random_slot_happy} is 1:
+							set {_item::grassslot} to "grass"
+							set {_damage::grassslot} to 0
+						if {_casino_random_slot_happy} is 2:
+							set {_item::grassslot} to "deadbush"
+							set {_damage::grassslot} to 0
+						if {_casino_random_slot_happy} is 3:
+							set {_item::grassslot} to "tallgrass"
+							set {_damage::grassslot} to 1
+						if {_casino_random_slot_happy} is 4:
+							set {_item::grassslot} to "double_plant"
+							set {_damage::grassslot} to 2
+						command "playsound block.grass.break player @a %{sm1_x}% %{sm1_y}% %{sm1_z}% 0.5 1"
+						wait 5 tick
+						command "entitydata @e[type=item_frame,x=%{sm1_x} - 1%,y=%{sm1_y}%,z=%{sm1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::grassslot}%"",Damage:%{_damage::grassslot}%s}}"
+						command "playsound block.grass.break player @a %{sm1_x}% %{sm1_y}% %{sm1_z}% 0.5 1"
+						wait 5 tick
+						command "entitydata @e[type=item_frame,x=%{sm1_x}%,y=%{sm1_y}%,z=%{sm1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::grassslot}%"",Damage:%{_damage::grassslot}%s}}"
+						command "playsound block.grass.break player @a %{sm1_x}% %{sm1_y}% %{sm1_z}% 0.5 1"
+						wait 5 tick
+						command "entitydata @e[type=item_frame,x=%{sm1_x} + 1%,y=%{sm1_y}%,z=%{sm1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::grassslot}%"",Damage:%{_damage::grassslot}%s}}"
+						if {_casino_random_slot_happy} is 1:
+							command "emc %player% add %{stock::%{sm1_locations_number}%} * 1.5%"
+							command "/give %player% minecraft:grass 1 0 {HideFlags:1,display:{Name:""§a§l§n§oシャイングラスブロック§r"",Lore:[""§f輝いている草ブロック""]},ench:[{id:34,lvl:1}]}"
+							send "&l%player%&rさんは&a&l&n草スロット&rで&2&l%{stock::%{sm1_locations_number}%} * 1.5%EM&rと&a&l&n&oシャイングラスブロック&rをゲットしました。&f(&e&l大当たり&f)" to all players
+							send "%player%さんは草スロットで%{stock::%{sm1_locations_number}%} * 1.5%EMとシャイングラスブロックをゲットしました。(大当たり)" to channel with id "694725485992738906" with "eb"
+							set {stock::%{sm1_locations_number}%} to 100000
+							command "summon fireworks_rocket %{sm1_x}% %{sm1_y}% %{sm1_z}% {NoGravity:1b,LifeTime:3,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Flicker:1,Colors:[I;2606080],FadeColors:[I;2883428]}]}}}}"
+							set {playcrs::%player%} to 0
+							command "/blockdata %{sm1_x}% %{sm1_y} + 1% %{sm1_z}% {Text1:""{\""text\"":\""====================\""}"",Text2:""[\""\"",{\""text\"":\""\\u8349\\u30b9\\u30ed\\u30c3\\u30c8 \""},{\""text\"":\""1\\u56de\"",\""color\"":\""black\""},{\""text\"":\""1\"",\""color\"":\""blue\""},{\""text\"":\""Cc\"",\""color\"":\""black\""}]"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{stock::%{sm1_locations_number}%}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+							stop
+						else:
+							command "emc %player% add %{stock::%{sm1_locations_number}%}%"
+							send "&l%player%&rさんは&a&l&n草スロット&rで&2&l%{stock::%{sm1_locations_number}%}%EM&rをゲットしました。&f(&e&l当たり&f)" to all players
+							send "%player%さんは草スロットで%{stock::%{sm1_locations_number}%}%EMをゲットしました。(当たり)" to channel with id "694725485992738906" with "eb"
+							set {stock::%{sm1_locations_number}%} to 100000
+							command "summon fireworks_rocket %{sm1_x}% %{sm1_y}% %{sm1_z}% {NoGravity:1b,LifeTime:3,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Flicker:1,Colors:[I;2606080],FadeColors:[I;2883428]}]}}}}"
+							set {playcrs::%player%} to 0
+							command "/blockdata %{sm1_x}% %{sm1_y} + 1% %{sm1_z}% {Text1:""{\""text\"":\""====================\""}"",Text2:""[\""\"",{\""text\"":\""\\u8349\\u30b9\\u30ed\\u30c3\\u30c8 \""},{\""text\"":\""1\\u56de\"",\""color\"":\""black\""},{\""text\"":\""1\"",\""color\"":\""blue\""},{\""text\"":\""Cc\"",\""color\"":\""black\""}]"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{stock::%{sm1_locations_number}%}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+							stop
+					else:
+						loop 3 time:
+							if {_grassslots} is 4:
+								set {_grassslots} to 1
+							set {casino_random_slot%{_grassslots}%::%player%} to random integer between 1 and 4
+							if {casino_random_slot%{_grassslots}%::%player%} is 1:
+								set {_item::grassslot%{_grassslots}%} to "grass"
+								set {_damage::grassslot%{_grassslots}%} to 0
+							if {casino_random_slot%{_grassslots}%::%player%} is 2:
+								set {_damage::grassslot%{_grassslots}%} to 0
+								set {_item::grassslot%{_grassslots}%} to "deadbush"
+							if {casino_random_slot%{_grassslots}%::%player%} is 3:
+								set {_item::grassslot%{_grassslots}%} to "tallgrass"
+								set {_damage::grassslot%{_grassslots}%} to 1
+							if {casino_random_slot%{_grassslots}%::%player%} is 4:
+								set {_item::grassslot%{_grassslots}%} to "double_plant"
+								set {_damage::grassslot%{_grassslots}%} to 2
+							add 1 to {_grassslots}
+						command "playsound block.grass.break player @a %{sm1_x}% %{sm1_y}% %{sm1_z}% 0.5 1"
+						wait 5 tick
+						command "entitydata @e[type=item_frame,x=%{sm1_x} - 1%,y=%{sm1_y}%,z=%{sm1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::grassslot1}%"",Damage:%{_damage::grassslot1}%s}}"
+						command "playsound block.grass.break player @a %{sm1_x}% %{sm1_y}% %{sm1_z}% 0.5 1"
+						wait 5 tick
+						command "entitydata @e[type=item_frame,x=%{sm1_x}%,y=%{sm1_y}%,z=%{sm1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::grassslot2}%"",Damage:%{_damage::grassslot2}%s}}"
+						command "playsound block.grass.break player @a %{sm1_x}% %{sm1_y}% %{sm1_z}% 0.5 1"
+						wait 5 tick
+						command "entitydata @e[type=item_frame,x=%{sm1_x} + 1%,y=%{sm1_y}%,z=%{sm1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::grassslot3}%"",Damage:%{_damage::grassslot3}%s}}"
+						if {casino_random_slot1::%player%} is {casino_random_slot2::%player%}:
+							if {casino_random_slot1::%player%} is {casino_random_slot3::%player%}:
+								if {casino_random_slot2::%player%} is {casino_random_slot3::%player%}:
+									if {casino_random_slot1::%player%} is 1:
+										command "emc %player% add %{stock::%{sm1_locations_number}%} * 1.5%"
+										command "/give %player% minecraft:grass 1 0 {HideFlags:1,display:{Name:""§a§l§n§oシャイングラスブロック§r"",Lore:[""§f輝いている草ブロック""]},ench:[{id:34,lvl:1}]}"
+										send "&l%player%&rさんは&a&l&n草スロット&rで&2&l%{stock::%{sm1_locations_number}%} * 1.5%EM&rと&a&l&n&oシャイングラスブロック&rをゲットしました。&f(&e&l大当たり&f)" to all players
+										send "%player%さんは草スロットで%{stock::%{sm1_locations_number}%} * 1.5%EMとシャイングラスブロックをゲットしました。(大当たり)" to channel with id "694725485992738906" with "eb"
+
+										set {stock::%{sm1_locations_number}%} to 100000
+										command "summon fireworks_rocket %{sm1_x}% %{sm1_y}% %{sm1_z}% {NoGravity:1b,LifeTime:3,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Flicker:1,Colors:[I;2606080],FadeColors:[I;2883428]}]}}}}"
+									else:
+										command "emc %player% add %{stock::%{sm1_locations_number}%}%"
+										send "&l%player%&rさんは&a&l&n草スロット&rで&2&l%{stock::%{sm1_locations_number}%}%EM&rをゲットしました。&f(&e&l当たり&f)" to all players
+										send "%player%さんは草スロットで%{stock::%{sm1_locations_number}%}%EMをゲットしました。(当たり)" to channel with id "694725485992738906" with "eb"
+										set {stock::%{sm1_locations_number}%} to 100000
+										command "summon fireworks_rocket %{sm1_x}% %{sm1_y}% %{sm1_z}% {NoGravity:1b,LifeTime:3,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Flicker:1,Colors:[I;2606080],FadeColors:[I;2883428]}]}}}}"
+								else:
+									send "&c何もゲットできませんでした。" to player
+							else:
+								send "&c何もゲットできませんでした。" to player
+						else:
+							send "&c何もゲットできませんでした。" to player
+						set {playcrs::%player%} to 0
+						command "/blockdata %{sm1_x}% %{sm1_y} + 1% %{sm1_z}% {Text1:""{\""text\"":\""====================\""}"",Text2:""[\""\"",{\""text\"":\""\\u8349\\u30b9\\u30ed\\u30c3\\u30c8 \""},{\""text\"":\""1\\u56de\"",\""color\"":\""black\""},{\""text\"":\""1\"",\""color\"":\""blue\""},{\""text\"":\""Cc\"",\""color\"":\""black\""}]"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{stock::%{sm1_locations_number}%}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+						stop
+			else:
+				send "&cコイン(x1)が足りません"
+
+	loop all entities in radius 4 of player:
+		if name of loop-entity is "sm2":
+			if player is holding 1 of magma cream with nbt "%{coinnbt::slotmachine}%":
+				if player has 2 of magma cream with nbt "%{coinnbt::slotmachine}%":
+					if {playcrs::%player%} is 1:
+						send "%{text1::slotmachine}%" to player
+						stop
+					else:
+						set {sm2_x} to loop-entity's x-coordinate + -0.5
+						set {sm2_y} to loop-entity's y-coordinate + 3.5
+						set {sm2_z} to loop-entity's z-coordinate + -1.5
+						set {sm2_locations_number} to "%{sm2_x}%%{sm2_y}%%{sm2_z}%"
+						set {playcrs::%player%} to 1
+						remove 2 of magma cream with nbt "%{coinnbt::slotmachine}%" from player's inventory
+						add 10000 to {stock::%{sm2_locations_number}%}
+						command "/blockdata %{sm2_x}% %{sm2_y} - 1% %{sm2_z}% {Text1:""{\""text\"":\""====================\""}"",Text2:""{\""text\"":\""\\u6728\\u9020\\u5efa\\u7bc9\\u30b9\\u30ed\\u30c3\\u30c8 1\\u56de2Cc\""}"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{stock::%{sm2_locations_number}%}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+						set {_woodbuildslots} to 1
+						loop 12 time:
+							command "playsound block.wood.break player @a %{sm2_x}% %{sm2_y}% %{sm2_z}% 0.5 1"
+							loop 3 time:
+								if {_woodbuildslots} is 4:
+									set {_woodbuildslots} to 1
+								set {casino_random_slot%{_woodbuildslots}%::%player%} to random integer between 1 and 6
+								if {casino_random_slot%{_woodbuildslots}%::%player%} is 1:
+									set {_item::woodbuildslot%{_woodbuildslots}%} to "planks"
+									set {_damage::woodbuildslot} to 0
+								if {casino_random_slot%{_woodbuildslots}%::%player%} is 2:
+									set {_item::woodbuildslot%{_woodbuildslots}%} to "planks"
+									set {_damage::woodbuildslot} to 1
+								if {casino_random_slot%{_woodbuildslots}%::%player%} is 3:
+									set {_item::woodbuildslot%{_woodbuildslots}%} to "planks"
+									set {_damage::woodbuildslot%{_woodbuildslots}%} to 2
+								if {casino_random_slot%{_woodbuildslots}%::%player%} is 4:
+									set {_item::woodbuildslot%{_woodbuildslots}%} to "planks"
+									set {_damage::woodbuildslot%{_woodbuildslots}%} to 3
+								if {casino_random_slot%{_woodbuildslots}%::%player%} is 5:
+									set {_item::woodbuildslot%{_woodbuildslots}%} to "planks"
+									set {_damage::woodbuildslot%{_woodbuildslots}%} to 4
+								if {casino_random_slot%{_woodbuildslots}%::%player%} is 6:
+									set {_item::woodbuildslot%{_woodbuildslots}%} to "planks"
+									set {_damage::woodbuildslot%{_woodbuildslots}%} to 5
+								add 1 to {_woodbuildslots}
+							command "entitydata @e[type=item_frame,x=%{sm2_x} - 1%,y=%{sm2_y}%,z=%{sm2_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::woodbuildslot1}%"",Damage:%{_damage::woodbuildslot1}%s}}"
+							command "entitydata @e[type=item_frame,x=%{sm2_x}%,y=%{sm2_y}%,z=%{sm2_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::woodbuildslot2}%"",Damage:%{_damage::woodbuildslot2}%s}}"
+							command "entitydata @e[type=item_frame,x=%{sm2_x} + 1%,y=%{sm2_y}%,z=%{sm2_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::woodbuildslot3}%"",Damage:%{_damage::woodbuildslot3}%s}}"
+							wait 5 tick
+						set {_woodbuildslotp} to random integer between 1 and 32
+						if {_woodbuildslotp} is 4:
+							set {_casino_random_slot_happy} to random integer between 1 and 6
+							if {_casino_random_slot_happy} is 1:
+								set {_item::woodbuildslot} to "planks"
+								set {_damage::woodbuildslot} to 0
+							if {_casino_random_slot_happy} is 2:
+								set {_item::woodbuildslot} to "planks"
+								set {_damage::woodbuildslot} to 1
+							if {_casino_random_slot_happy} is 3:
+								set {_item::woodbuildslot} to "planks"
+								set {_damage::woodbuildslot} to 2
+							if {_casino_random_slot_happy} is 4:
+								set {_item::woodbuildslot} to "planks"
+								set {_damage::woodbuildslot} to 3
+							if {_casino_random_slot_happy} is 5:
+								set {_item::woodbuildslot} to "planks"
+								set {_damage::woodbuildslot} to 4
+							if {_casino_random_slot_happy} is 6:
+								set {_item::woodbuildslot} to "planks"
+								set {_damage::woodbuildslot} to 5
+							command "playsound block.wood.break player @a %{sm2_x}% %{sm2_y}% %{sm2_z}% 0.5 1"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{sm2_x} - 1%,y=%{sm2_y}%,z=%{sm2_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::woodbuildslot}%"",Damage:%{_damage::woodbuildslot}%s}}"
+							command "playsound block.wood.break player @a %{sm2_x}% %{sm2_y}% %{sm2_z}% 0.5 1"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{sm2_x}%,y=%{sm2_y}%,z=%{sm2_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::woodbuildslot}%"",Damage:%{_damage::woodbuildslot}%s}}"
+							command "playsound block.wood.break player @a %{sm2_x}% %{sm2_y}% %{sm2_z}% 0.5 1"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{sm2_x} + 1%,y=%{sm2_y}%,z=%{sm2_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::woodbuildslot}%"",Damage:%{_damage::woodbuildslot}%s}}"
+							command "emc %player% add %{stock::%{sm2_locations_number}%}%"
+							send "&l%player%&rさんは&4&l&n木造建築スロット&rで&2&l%{stock::%{sm2_locations_number}%}%EM&rをゲットしました。&f(&e&l当たり&f)" to all players
+							send "%player%さんは木造建築スロットで%{stock::%{sm2_locations_number}%}%EMをゲットしました。(当たり)" to channel with id "694725485992738906" with "eb"
+							set {stock::%{sm2_locations_number}%} to 1000000
+							command "summon fireworks_rocket %{sm2_x}% %{sm2_y}% %{sm2_z} + 1% {NoGravity:1b,LifeTime:3,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Flicker:1,Colors:[I;16759155],FadeColors:[I;5191455]}]}}}}"
+							set {playcrs::%player%} to 0
+							command "/blockdata %{sm2_x}% %{sm2_y} - 1% %{sm2_z}% {Text1:""{\""text\"":\""====================\""}"",Text2:""{\""text\"":\""\\u6728\\u9020\\u5efa\\u7bc9\\u30b9\\u30ed\\u30c3\\u30c8 1\\u56de2Cc\""}"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{stock::%{sm2_locations_number}%}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+							stop
+						else:
+							loop 3 time:
+								if {_woodbuildslots} is 4:
+									set {_woodbuildslots} to 1
+								set {casino_random_slot%{_woodbuildslots}%::%player%} to random integer between 1 and 6
+								if {casino_random_slot%{_woodbuildslots}%::%player%} is 1:
+									set {_item::woodbuildslot%{_woodbuildslots}%} to "planks"
+									set {_damage::woodbuildslot%{_woodbuildslots}%} to 0
+								if {casino_random_slot%{_woodbuildslots}%::%player%} is 2:
+									set {_item::woodbuildslot%{_woodbuildslots}%} to "planks"
+									set {_damage::woodbuildslot%{_woodbuildslots}%} to 1
+								if {casino_random_slot%{_woodbuildslots}%::%player%} is 3:
+									set {_item::woodbuildslot%{_woodbuildslots}%} to "planks"
+									set {_damage::woodbuildslot%{_woodbuildslots}%} to 2
+								if {casino_random_slot%{_woodbuildslots}%::%player%} is 4:
+									set {_item::woodbuildslot%{_woodbuildslots}%} to "planks"
+									set {_damage::woodbuildslot%{_woodbuildslots}%} to 3
+								if {casino_random_slot%{_woodbuildslots}%::%player%} is 5:
+									set {_item::woodbuildslot%{_woodbuildslots}%} to "planks"
+									set {_damage::woodbuildslot%{_woodbuildslots}%} to 4
+								if {casino_random_slot%{_woodbuildslots}%::%player%} is 6:
+									set {_item::woodbuildslot%{_woodbuildslots}%} to "planks"
+									set {_damage::woodbuildslot%{_woodbuildslots}%} to 5
+								add 1 to {_woodbuildslots}
+							command "entitydata @e[type=item_frame,x=%{sm2_x} - 1%,y=%{sm2_y}%,z=%{sm2_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::woodbuildslot1}%"",Damage:%{_damage::woodbuildslot1}%s}}"
+							command "playsound block.wood.break player @a %{sm2_x}% %{sm2_y}% %{sm2_z}% 0.5 1"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{sm2_x}%,y=%{sm2_y}%,z=%{sm2_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::woodbuildslot2}%"",Damage:%{_damage::woodbuildslot2}%s}}"
+							command "playsound block.wood.break player @a %{sm2_x}% %{sm2_y}% %{sm2_z}% 0.5 1"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{sm2_x} + 1%,y=%{sm2_y}%,z=%{sm2_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::woodbuildslot3}%"",Damage:%{_damage::woodbuildslot3}%s}}"
+							command "playsound block.wood.break player @a %{sm2_x}% %{sm2_y}% %{sm2_z}% 0.5 1"
+							wait 5 tick
+							if {casino_random_slot1::%player%} is {casino_random_slot2::%player%}:
+								if {casino_random_slot1::%player%} is {casino_random_slot3::%player%}:
+									if {casino_random_slot2::%player%} is {casino_random_slot3::%player%}:
+										command "emc %player% add %{stock::%{sm2_locations_number}%}%"
+										send "&l%player%&rさんは&4&l&n木造建築スロット&rで&2&l%{stock::%{sm2_locations_number}%}%EM&rをゲットしました。&f(&e&l当たり&f)" to all players
+										send "%player%さんは木造建築スロットで%{stock::%{sm2_locations_number}%}%EMをゲットしました。(当たり)" to channel with id "694725485992738906" with "eb"
+										set {stock::%{sm2_locations_number}%} to 1000000
+										command "summon fireworks_rocket %{sm2_x}% %{sm2_y}% %{sm2_z} + 1% {NoGravity:1b,LifeTime:3,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Flicker:1,Colors:[I;16759155],FadeColors:[I;5191455]}]}}}}"
+									else:
+										send "&c何もゲットできませんでした。" to player
+								else:
+									send "&c何もゲットできませんでした。" to player
+							else:
+								send "&c何もゲットできませんでした。" to player
+							set {playcrs::%player%} to 0
+							command "/blockdata %{sm2_x}% %{sm2_y} - 1% %{sm2_z}% {Text1:""{\""text\"":\""====================\""}"",Text2:""{\""text\"":\""\\u6728\\u9020\\u5efa\\u7bc9\\u30b9\\u30ed\\u30c3\\u30c8 1\\u56de2Cc\""}"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{stock::%{sm2_locations_number}%}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+							stop
+				else:
+					send "&cコイン(x2)が足りません"
+	loop all entities in radius 5 of player:
+		if name of loop-entity is "sm3":
+			if player is holding 1 of magma cream with nbt "%{coinnbt::slotmachine}%":
+				if player has 10 of magma cream with nbt "%{coinnbt::slotmachine}%":
+					if {playcrs::%player%} is 1:
+						send "%{text1::slotmachine}%" to player
+						stop
+					else:
+						set {sm3_x} to loop-entity's x-coordinate + -0.5
+						set {sm3_y} to loop-entity's y-coordinate + 1.5
+						set {sm3_z} to loop-entity's z-coordinate + -1.5
+						set {sm3_locations_number} to "%{sm3_x}%%{sm3_y}%%{sm3_z}%"
+						set {playcrs::%player%} to 1
+						remove 10 of magma cream with nbt "%{coinnbt::slotmachine}%" from player's inventory
+						add 50000 to {stock::%{sm3_locations_number}%}
+						command "/blockdata %{sm3_x} - 1% %{sm3_y} - 1% %{sm3_z}% {Text1:""{\""text\"":\""====================\""}"",Text2:""{\""text\"":\""\\u5674\\u6c34\\u30b9\\u30ed\\u30c3\\u30c81\\u56de10Cc\""}"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{stock::%{sm3_locations_number}%}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+						set {crstime::%player%} to random integer between 10 and 20
+						set {_fountainslots} to 1
+						loop {crstime::%player%} time:
+							command "playsound item.bottle.fill player @a %{sm3_x}% %{sm3_y}% %{sm3_z}% 0.5 1"
+							loop 4 time:
+								if {_fountainslots} is 5:
+									set {_fountainslots} to 1
+								set {casino_random_slot%{_fountainslots}%::%player%} to random integer between 1 and 5
+								if {casino_random_slot%{_fountainslots}%::%player%} is 1:
+									set {_item::fountainslot%{_fountainslots}%} to "fish"
+									set {_damage::fountainslot%{_fountainslots}%} to 0
+								if {casino_random_slot%{_fountainslots}%::%player%} is 2:
+									set {_item::fountainslot%{_fountainslots}%} to "water_bucket"
+									set {_damage::fountainslot%{_fountainslots}%} to 0
+								if {casino_random_slot%{_fountainslots}%::%player%} is 3:
+									set {_item::fountainslot%{_fountainslots}%} to "potion"
+									set {_damage::fountainslot%{_fountainslots}%} to 0
+								if {casino_random_slot%{_fountainslots}%::%player%} is 4:
+									set {_item::fountainslot%{_fountainslots}%} to "magma_cream"
+									set {_damage::fountainslot%{_fountainslots}%} to 0
+								if {casino_random_slot%{_fountainslots}%::%player%} is 5:
+									set {_item::fountainslot%{_fountainslots}%} to "splash_potion"
+									set {_damage::fountainslot%{_fountainslots}%} to 0
+								add 1 to {_fountainslots}
+							command "entitydata @e[type=item_frame,x=%{sm3_x}%,y=%{sm3_y} + 2%,z=%{sm3_z} + 3%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::fountainslot1}%"",Damage:%{_damage::fountainslot1}%s}}"
+							command "entitydata @e[type=item_frame,x=%{sm3_x} - 1%,y=%{sm3_y} + 2%,z=%{sm3_z} + 3%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::fountainslot2}%"",Damage:%{_damage::fountainslot2}%s}}"
+							command "entitydata @e[type=item_frame,x=%{sm3_x} - 2%,y=%{sm3_y} + 2%,z=%{sm3_z} + 3%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::fountainslot3}%"",Damage:%{_damage::fountainslot3}%s}}"
+							command "entitydata @e[type=item_frame,x=%{sm3_x} - 3%,y=%{sm3_y} + 2%,z=%{sm3_z} + 3%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::fountainslot4}%"",Damage:%{_damage::fountainslot4}%s}}"
+							wait 5 tick
+						set {_fountainslotp} to random integer between 1 and 60
+						if {_fountainslotp} is 20:
+							set {_casino_random_slot_happy} to random integer between 1 and 5
+							if {_casino_random_slot_happy} is 1:
+								set {_item::fountainslot} to "fish"
+								set {_damage::fountainslot} to 0
+							if {_casino_random_slot_happy} is 2:
+								set {_item::fountainslot} to "water_bucket"
+								set {_damage::fountainslot} to 0
+							if {_casino_random_slot_happy} is 3:
+								set {_item::fountainslot} to "potion"
+								set {_damage::fountainslot} to 0
+							if {_casino_random_slot_happy} is 4:
+								set {_item::fountainslot} to "magma_cream"
+								set {_damage::fountainslot} to 0
+							if {_casino_random_slot_happy} is 5:
+								set {_item::fountainslot} to "splash_potion"
+								set {_damage::fountainslot} to 0
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{sm3_x}%,y=%{sm3_y} + 2%,z=%{sm3_z} + 3%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::fountainslot}%"",Damage:%{_damage::fountainslot}%s}}"
+							command "playsound item.bottle.fill player @a %{sm3_x}% %{sm3_y}% %{sm3_z}% 0.5 1"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{sm3_x} - 1%,y=%{sm3_y} + 2%,z=%{sm3_z} + 3%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::fountainslot}%"",Damage:%{_damage::fountainslot}%s}}"
+							command "playsound item.bottle.fill player @a %{sm3_x}% %{sm3_y}% %{sm3_z}% 0.5 1"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{sm3_x} - 2%,y=%{sm3_y} + 2%,z=%{sm3_z} + 3%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::fountainslot}%"",Damage:%{_damage::fountainslot}%s}}"
+							command "playsound item.bottle.fill player @a %{sm3_x}% %{sm3_y}% %{sm3_z}% 0.5 1"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{sm3_x} - 3%,y=%{sm3_y} + 2%,z=%{sm3_z} + 3%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::fountainslot}%"",Damage:%{_damage::fountainslot}%s}}"
+							command "playsound item.bottle.fill player @a %{sm3_x}% %{sm3_y}% %{sm3_z}% 0.5 1"
+							if {_casino_random_slot_happy} is 1:
+								command "emc %player% add %{stock::%{sm3_locations_number}%} * 1.5%"
+								command "/give %player% minecraft:fish 1 0 {HideFlags:1,display:{Name:""§9§l§n§o噴水の魚§r"",Lore:[""§f噴水の魚、釣ってはいけないのでカジノのスタッフ（村人）に返そう。""]},ench:[{id:34,lvl:1}]}"
+								send "&l%player%&rさんは&6&l&n噴水スロット&rで&2&l%{stock::%{sm3_locations_number}%} * 1.5%EM&rと&6&l&n&o噴水の魚&rをゲットしました。&f(&e&l大当たり&f)" to all players
+								send "%player%さんは噴水スロットで%{stock::%{sm3_locations_number}%} * 1.5%EMと噴水の魚をゲットしました。(大当たり)" to channel with id "694725485992738906" with "eb"
+								set {stock::%{sm3_locations_number}%} to 7500000
+								command "playsound item.totem.use player @a %{sm3_x}% %{sm3_y}% %{sm3_z}% 0.5 1"
+								command "summon area_effect_cloud %{sm3_x}% %{sm3_y}% %{sm3_z}% {NoGravity:1b,Particle:splash,Radius:2f,RadiusPerTick:0f,RadiusOnUse:0f,Duration:60,DurationOnUse:0f,WaitTime:60,Color:16187256,Potion:""minecraft:water""}"
+								set {playcrs::%player%} to 0
+								command "/blockdata %{sm3_x} - 1% %{sm3_y} - 1% %{sm3_z}% {Text1:""{\""text\"":\""====================\""}"",Text2:""{\""text\"":\""\\u5674\\u6c34\\u30b9\\u30ed\\u30c3\\u30c81\\u56de10Cc\""}"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{stock::%{sm3_locations_number}%}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+								stop
+							else:
+								command "emc %player% add %{stock::%{sm3_locations_number}%}%"
+								send "&l%player%&rさんは&6&l&n噴水スロット&rで&2&l%{stock::%{sm3_locations_number}%}%EM&rをゲットしました。&f(&e&l当たり&f)" to all players
+								send "%player%さんは噴水スロットで%{stock::%{sm3_locations_number}%}%EMをゲットしました。(当たり)" to channel with id "694725485992738906" with "eb"
+								set {stock::%{sm3_locations_number}%} to 7500000
+								command "playsound item.totem.use player @a %{sm3_x}% %{sm3_y}% %{sm3_z}% 0.5 1"
+								command "summon area_effect_cloud %{sm3_x}% %{sm3_y}% %{sm3_z}% {NoGravity:1b,Particle:splash,Radius:2f,RadiusPerTick:0f,RadiusOnUse:0f,Duration:60,DurationOnUse:0f,WaitTime:60,Color:16187256,Potion:""minecraft:water""}"
+								set {playcrs::%player%} to 0
+								command "/blockdata %{sm3_x} - 1% %{sm3_y} - 1% %{sm3_z}% {Text1:""{\""text\"":\""====================\""}"",Text2:""{\""text\"":\""\\u5674\\u6c34\\u30b9\\u30ed\\u30c3\\u30c81\\u56de10Cc\""}"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{stock::%{sm3_locations_number}%}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+								stop
+						else:
+							loop 4 time:
+								if {_fountainslots} is 5:
+									set {_fountainslots} to 1
+								set {casino_random_slot%{_fountainslots}%::%player%} to random integer between 1 and 5
+								if {casino_random_slot%{_fountainslots}%::%player%} is 1:
+									set {_item::fountainslot%{_fountainslots}%} to "fish"
+									set {_damage::fountainslot%{_fountainslots}%} to 0
+								if {casino_random_slot%{_fountainslots}%::%player%} is 2:
+									set {_item::fountainslot%{_fountainslots}%} to "water_bucket"
+									set {_damage::fountainslot%{_fountainslots}%} to 0
+								if {casino_random_slot%{_fountainslots}%::%player%} is 3:
+									set {_item::fountainslot%{_fountainslots}%} to "splash_potion"
+									set {_damage::fountainslot%{_fountainslots}%} to 0
+								if {casino_random_slot%{_fountainslots}%::%player%} is 4:
+									set {_item::fountainslot%{_fountainslots}%} to "magma_cream"
+									set {_damage::fountainslot%{_fountainslots}%} to 0
+								if {casino_random_slot%{_fountainslots}%::%player%} is 5:
+									set {_item::fountainslot%{_fountainslots}%} to "potion"
+									set {_damage::fountainslot%{_fountainslots}%} to 0
+								add 1 to {_fountainslots}
+							command "entitydata @e[type=item_frame,x=%{sm3_x}%,y=%{sm3_y} + 2%,z=%{sm3_z} + 3%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::fountainslot1}%"",Damage:%{_damage::fountainslot1}%s}}"
+							command "playsound item.bottle.fill player @a %{sm3_x}% %{sm3_y}% %{sm3_z}% 0.5 1"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{sm3_x} - 1%,y=%{sm3_y} + 2%,z=%{sm3_z} + 3%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::fountainslot2}%"",Damage:%{_damage::fountainslot2}%s}}"
+							command "playsound item.bottle.fill player @a %{sm3_x}% %{sm3_y}% %{sm3_z}% 0.5 1"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{sm3_x} - 2%,y=%{sm3_y} + 2%,z=%{sm3_z} + 3%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::fountainslot3}%"",Damage:%{_damage::fountainslot3}%s}}"
+							command "playsound item.bottle.fill player @a %{sm3_x}% %{sm3_y}% %{sm3_z}% 0.5 1"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{sm3_x} - 3%,y=%{sm3_y} + 2%,z=%{sm3_z} + 3%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::fountainslot4}%"",Damage:%{_damage::fountainslot4}%s}}"
+							command "playsound item.bottle.fill player @a %{sm3_x}% %{sm3_y}% %{sm3_z}% 0.5 1"
+							wait 5 tick
+							if {casino_random_slot1::%player%} is {casino_random_slot2::%player%}:
+								if {casino_random_slot1::%player%} is {casino_random_slot3::%player%}:
+									if {casino_random_slot2::%player%} is {casino_random_slot3::%player%}:
+										if {casino_random_slot2::%player%} is {casino_random_slot4::%player%}:
+											if {casino_random_slot1::%player%} is 1:
+												command "emc %player% add %{stock::%{sm3_locations_number}%} * 1.5%"
+												command "/give %player% minecraft:fish 1 0 {HideFlags:1,display:{Name:""§9§l§n§o噴水の魚§r"",Lore:[""§f噴水の魚、釣ってはいけないのでカジノのスタッフ（村人）に返そう。""]},ench:[{id:34,lvl:1}]}"
+												send "&l%player%&rさんは&6&l&n噴水スロット&rで&2&l%{stock::%{sm3_locations_number}%} * 1.5%EM&rと&6&l&n&o噴水の魚&rをゲットしました。&f(&e&l大当たり&f)" to all players
+												send "%player%さんは噴水スロットで%{stock::%{sm3_locations_number}%} * 1.5%EMと噴水の魚をゲットしました。(大当たり)" to channel with id "694725485992738906" with "eb"
+												set {stock::%{sm3_locations_number}%} to 7500000
+												command "playsound item.totem.use player @a %{sm3_x}% %{sm3_y}% %{sm3_z}% 0.5 1"
+												command "summon area_effect_cloud %{sm3_x}% %{sm3_y}% %{sm3_z}% {NoGravity:1b,Particle:splash,Radius:2f,RadiusPerTick:0f,RadiusOnUse:0f,Duration:60,DurationOnUse:0f,WaitTime:60,Color:16187256,Potion:""minecraft:water""}"
+											else:
+												command "emc %player% add %{stock::%{sm3_locations_number}%}%"
+												send "&l%player%&rさんは&6&l&n噴水スロット&rで&2&l%{stock::%{sm3_locations_number}%}%EM&rをゲットしました。&f(&e&l当たり&f)" to all players
+												send "%player%さんは噴水スロットで%{stock::%{sm3_locations_number}%}%EMをゲットしました。(当たり)" to channel with id "694725485992738906" with "eb"
+												set {stock::%{sm3_locations_number}%} to 7500000
+												command "playsound item.totem.use player @a %{sm3_x}% %{sm3_y}% %{sm3_z}% 0.5 1"
+												command "summon area_effect_cloud %{sm3_x}% %{sm3_y}% %{sm3_z}% {NoGravity:1b,Particle:splash,Radius:2f,RadiusPerTick:0f,RadiusOnUse:0f,Duration:60,DurationOnUse:0f,WaitTime:60,Color:16187256,Potion:""minecraft:water""}"
+										else:
+											send "&c何もゲットできませんでした。" to player
+									else:
+										send "&c何もゲットできませんでした。" to player
+								else:
+									send "&c何もゲットできませんでした。" to player
+							else:
+								send "&c何もゲットできませんでした。" to player
+							set {playcrs::%player%} to 0
+							command "/blockdata %{sm3_x} - 1% %{sm3_y} - 1% %{sm3_z}% {Text1:""{\""text\"":\""====================\""}"",Text2:""{\""text\"":\""\\u5674\\u6c34\\u30b9\\u30ed\\u30c3\\u30c81\\u56de10Cc\""}"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{stock::%{sm3_locations_number}%}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+							stop
+				else:
+					send "&cコイン(x10)が足りません"
+	loop all entities in radius 4 of player:
+		if name of loop-entity is "sm4":
+			if player is holding 1 of magma cream with nbt "%{coinnbt::slotmachine}%":
+				if player has 5 of magma cream with nbt "%{coinnbt::slotmachine}%":
+					if {playcrs::%player%} is 1:
+						send "%{text1::slotmachine}%" to player
+						stop
+					else:
+						set {sm4_x} to loop-entity's x-coordinate + -0.5
+						set {sm4_y} to loop-entity's y-coordinate + 2.5
+						set {sm4_z} to loop-entity's z-coordinate + 0.5
+						set {sm4_locations_number} to "%{sm4_x}%%{sm4_y}%%{sm4_z}%"
+						set {playcrs::%player%} to 1
+						remove 5 of magma cream with nbt "%{coinnbt::slotmachine}%" from player's inventory
+						command "/blockdata 475 21 -476 {Text1:""{\""text\"":\""====================\""}"",Text2:""{\""text\"":\""\\u30d5\\u30fc\\u30c9\\u30b9\\u30ed\\u30c3\\u30c8 1\\u56de5Cc\""}"",Text3:""[\""\"",{\""text\"":\""\\u5831\\u916c\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""100000(No stock)\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+						set {crstime::%player%} to random integer between 20 and 40
+						set {_foodslots} to 1
+						loop {crstime::%player%} time:
+							command "playsound entity.generic.eat player @a %{sm4_x}% %{sm4_y}% %{sm4_z}% 0.5 1"
+							loop 3 time:
+								if {_foodslots} is 4:
+									set {_foodslots} to 1
+								set {casino_random_slot%{_foodslots}%::%player%} to random integer between 1 and 16
+								if {casino_random_slot%{_foodslots}%::%player%} is 1:
+									set {_item::foodslot%{_foodslots}%} to "cake"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 2:
+									set {_item::foodslot%{_foodslots}%} to "melon"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 3:
+									set {_item::foodslot%{_foodslots}%} to "cookie"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 4:
+									set {_item::foodslot%{_foodslots}%} to "tnt"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 5:
+									set {_item::foodslot%{_foodslots}%} to "pumpkin_pie"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 6:
+									set {_item::foodslot%{_foodslots}%} to "apple"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 7:
+									set {_item::foodslot%{_foodslots}%} to "cooked_beef"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 8:
+									set {_item::foodslot%{_foodslots}%} to "cooked_chicken"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 9:
+									set {_item::foodslot%{_foodslots}%} to "cooked_porkchop"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 10:
+									set {_item::foodslot%{_foodslots}%} to "golden_apple"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 11:
+									set {_item::foodslot%{_foodslots}%} to "golden_carrot"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 12:
+									set {_item::foodslot%{_foodslots}%} to "carrot"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 13:
+									set {_item::foodslot%{_foodslots}%} to "beetroot"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 14:
+									set {_item::foodslot%{_foodslots}%} to "cooked_mutton"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 15:
+									set {_item::foodslot%{_foodslots}%} to "mushroom_stew"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 16:
+									set {_item::foodslot%{_foodslots}%} to "bread"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								add 1 to {_foodslots}
+							command "entitydata @e[type=item_frame,x=%{sm4_x}%,y=%{sm4_y}%,z=%{sm4_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::foodslot1}%"",Damage:%{_damage::foodslot1}%s}}"
+							command "entitydata @e[type=item_frame,x=%{sm4_x} - 1%,y=%{sm4_y}%,z=%{sm4_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::foodslot2}%"",Damage:%{_damage::foodslot2}%s}}"
+							command "entitydata @e[type=item_frame,x=%{sm4_x} + 1%,y=%{sm4_y}%,z=%{sm4_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::foodslot3}%"",Damage:%{_damage::foodslot3}%s}}"
+							wait 2 tick
+						set {_foodslotp} to random integer between 1 and 2
+						if {_foodslotp} is 2:
+							set {_casino_random_slot_happy} to random integer between 1 and 16
+							if {_casino_random_slot_happy} is 1:
+								set {_item::foodslot} to "cake"
+								set {_damage::foodslot} to 0
+							if {_casino_random_slot_happy} is 2:
+								set {_item::foodslot} to "melon"
+								set {_damage::foodslot} to 0
+							if {_casino_random_slot_happy} is 3:
+								set {_item::foodslot} to "cookie"
+								set {_damage::foodslot} to 0
+							if {_casino_random_slot_happy} is 4:
+								set {_item::foodslot} to "tnt"
+								set {_damage::foodslot} to 0
+							if {_casino_random_slot_happy} is 5:
+								set {_item::foodslot} to "pumpkin_pie"
+								set {_damage::foodslot} to 0
+							if {_casino_random_slot_happy} is 6:
+								set {_item::foodslot} to "apple"
+								set {_damage::foodslot} to 0
+							if {_casino_random_slot_happy} is 7:
+								set {_item::foodslot} to "cooked_beef"
+								set {_damage::foodslot} to 0
+							if {_casino_random_slot_happy} is 8:
+								set {_item::foodslot} to "cooked_chicken"
+								set {_damage::foodslot} to 0
+							if {_casino_random_slot_happy} is 9:
+								set {_item::foodslot} to "cooked_porkchop"
+								set {_damage::foodslot} to 0
+							if {_casino_random_slot_happy} is 10:
+								set {_item::foodslot} to "golden_apple"
+								set {_damage::foodslot} to 0
+							if {_casino_random_slot_happy} is 11:
+								set {_item::foodslot} to "golden_carrot"
+								set {_damage::foodslot} to 0
+							if {_casino_random_slot_happy} is 12:
+								set {_item::foodslot} to "carrot"
+								set {_damage::foodslot} to 0
+							if {_casino_random_slot_happy} is 13:
+								set {_item::foodslot} to "beetroot"
+								set {_damage::foodslot} to 0
+							if {_casino_random_slot_happy} is 14:
+								set {_item::foodslot} to "cooked_mutton"
+								set {_damage::foodslot} to 0
+							if {_casino_random_slot_happy} is 15:
+								set {_item::foodslot} to "mushroom_stew"
+								set {_damage::foodslot} to 0
+							if {_casino_random_slot_happy} is 16:
+								set {_item::foodslot} to "bread"
+								set {_damage::foodslot} to 0
+							command "entitydata @e[type=item_frame,x=%{sm4_x}%,y=%{sm4_y}%,z=%{sm4_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::foodslot}%"",Damage:%{_damage::foodslot}%s}}"
+							command "playsound entity.generic.eat player @a %{sm4_x}% %{sm4_y}% %{sm4_z}% 0.5 1"
+							wait 2 tick
+							command "entitydata @e[type=item_frame,x=%{sm4_x} - 1%,y=%{sm4_y}%,z=%{sm4_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::foodslot}%"",Damage:%{_damage::foodslot}%s}}"
+							command "playsound entity.generic.eat player @a %{sm4_x}% %{sm4_y}% %{sm4_z}% 0.5 1"
+							wait 2 tick
+							command "entitydata @e[type=item_frame,x=%{sm4_x} + 1%,y=%{sm4_y}%,z=%{sm4_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::foodslot}%"",Damage:%{_damage::foodslot}%s}}"
+							command "playsound entity.generic.eat player @a %{sm4_x}% %{sm4_y}% %{sm4_z}% 0.5 1"
+							wait 2 tick
+							command "emc %player% add 100000"
+							command "/give %player% minecraft:%{_item::foodslot}% 1 0"
+							send "&l%player%&rさんは&6&l&nフードスロット&rで&2&l100000EM&rと&6&l&n&o%{_item::foodslot}%&rをゲットしました。&f(&e&l当たり&f)" to all players
+							send "%player%さんはフードスロットで100000EMと%{_item::foodslot}%をゲットしました。(当たり)" to channel with id "694725485992738906" with "eb"
+							if {_casino_random_slot_happy} is 4:
+								command "summon tnt %{sm4_x}% %{sm4_y}% %{sm4_z}%"
+							else:
+								command "summon fireworks_rocket %{sm4_x}% %{sm4_y}% %{sm4_z}% {NoGravity:1b,LifeTime:3,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:0,Colors:[I;4584447],FadeColors:[I;16152831]}]}}}}"
+							set {playcrs::%player%} to 0
+							stop
+
+						else:
+							loop 3 time:
+								if {_foodslots} is 4:
+									set {_foodslots} to 1
+								set {casino_random_slot%{_foodslots}%::%player%} to random integer between 1 and 16
+								if {casino_random_slot%{_foodslots}%::%player%} is 1:
+									set {_item::foodslot%{_foodslots}%} to "cake"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 2:
+									set {_item::foodslot%{_foodslots}%} to "melon"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 3:
+									set {_item::foodslot%{_foodslots}%} to "cookie"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 4:
+									set {_item::foodslot%{_foodslots}%} to "tnt"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 5:
+									set {_item::foodslot%{_foodslots}%} to "pumpkin_pie"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 6:
+									set {_item::foodslot%{_foodslots}%} to "apple"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 7:
+									set {_item::foodslot%{_foodslots}%} to "cooked_beef"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 8:
+									set {_item::foodslot%{_foodslots}%} to "cooked_chicken"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 9:
+									set {_item::foodslot%{_foodslots}%} to "cooked_porkchop"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 10:
+									set {_item::foodslot%{_foodslots}%} to "golden_apple"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 11:
+									set {_item::foodslot%{_foodslots}%} to "golden_carrot"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 12:
+									set {_item::foodslot%{_foodslots}%} to "carrot"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 13:
+									set {_item::foodslot%{_foodslots}%} to "beetroot"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 14:
+									set {_item::foodslot%{_foodslots}%} to "cooked_mutton"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 15:
+									set {_item::foodslot%{_foodslots}%} to "mushroom_stew"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								if {casino_random_slot%{_foodslots}%::%player%} is 16:
+									set {_item::foodslot%{_foodslots}%} to "bread"
+									set {_damage::foodslot%{_foodslots}%} to 0
+								add 1 to {_foodslots}
+							command "entitydata @e[type=item_frame,x=%{sm4_x}%,y=%{sm4_y}%,z=%{sm4_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::foodslot1}%"",Damage:%{_damage::foodslot1}%s}}"
+							command "playsound entity.generic.eat player @a %{sm4_x}% %{sm4_y}% %{sm4_z}% 0.5 1"
+							wait 2 tick
+							command "entitydata @e[type=item_frame,x=%{sm4_x} - 1%,y=%{sm4_y}%,z=%{sm4_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::foodslot2}%"",Damage:%{_damage::foodslot2}%s}}"
+							command "playsound entity.generic.eat player @a %{sm4_x}% %{sm4_y}% %{sm4_z}% 0.5 1"
+							wait 2 tick
+							command "entitydata @e[type=item_frame,x=%{sm4_x} + 1%,y=%{sm4_y}%,z=%{sm4_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::foodslot3}%"",Damage:%{_damage::foodslot3}%s}}"
+							command "playsound entity.generic.eat player @a %{sm4_x}% %{sm4_y}% %{sm4_z}% 0.5 1"
+							wait 2 tick
+							if {casino_random_slot1::%player%} is {casino_random_slot2::%player%}:
+								if {casino_random_slot1::%player%} is {casino_random_slot3::%player%}:
+									if {casino_random_slot2::%player%} is {casino_random_slot3::%player%}:
+										if {casino_random_slot2::%player%} is {casino_random_slot4::%player%}:
+											command "emc %player% add 100000"
+											command "/give %player% minecraft:%{_item::foodslot}% 1 0"
+											send "&l%player%&rさんは&6&l&nフードスロット&rで&2&l100000EM&rと&6&l&n&o%{_item::foodslot}%&rをゲットしました。&f(&e&l当たり&f)" to all players
+											send "%player%さんはフードスロットで100000EMと%{_item::foodslot}%をゲットしました。(当たり)" to channel with id "694725485992738906" with "eb"
+											if {_item::foodslot1} is "tnt":
+												command "summon tnt %{sm4_x}% %{sm4_y}% %{sm4_z}%"
+											else:
+												command "summon fireworks_rocket %{sm4_x}% %{sm4_y}% %{sm4_z}% {NoGravity:1b,LifeTime:3,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:0,Colors:[I;4584447],FadeColors:[I;16152831]}]}}}}"
+										else:
+											send "&c何もゲットできませんでした。" to player
+									else:
+										send "&c何もゲットできませんでした。" to player
+								else:
+									send "&c何もゲットできませんでした。" to player
+							else:
+								send "&c何もゲットできませんでした。" to player
+							set {playcrs::%player%} to 0
+							stop
+				else:
+					send "&cコイン(x5)が足りません。"
+	loop all entities in radius 7 of player:
+		if name of loop-entity is "god1":
+			if player is holding 1 of magma cream with nbt "%{coinnbt::slotmachine}%":
+				if player has 300 of magma cream with nbt "%{coinnbt::slotmachine}%":
+					if {playcrs::%player%} is 1:
+						send "%{text1::slotmachine}%" to player
+						stop
+					else:
+						set {god1_x} to loop-entity's x-coordinate + -0.5
+						set {god1_y} to loop-entity's y-coordinate + 4.5
+						set {god1_z} to loop-entity's z-coordinate + -6.5
+						set {god1_locations_number} to "%{god1_x}%%{god1_y}%%{god1_z}%"
+						set {playcrs::%player%} to 1
+						add 777777 to {stock::%{god1_locations_number}%}
+						remove 64 of magma cream with nbt "%{coinnbt::slotmachine}%" from player's inventory
+						remove 44 of magma cream with nbt "%{coinnbt::slotmachine}%" from player's inventory
+						remove 64 of magma cream with nbt "%{coinnbt::slotmachine}%" from player's inventory
+						remove 64 of magma cream with nbt "%{coinnbt::slotmachine}%" from player's inventory
+						remove 64 of magma cream with nbt "%{coinnbt::slotmachine}%" from player's inventory
+						command "/blockdata 528 39 -491 {Text1:""{\""text\"":\""====================\""}"",Text2:""{\""text\"":\""BIG GOD 1\\u56de300Cc\""}"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{got1_locations_number}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+						set {crstime::%player%} to random integer between 10 and 30
+						set {_god1slots} to 1
+						loop {crstime::%player%} time:
+							command "playsound entity.zombie.attack_iron_door player @a %{god1_x}% %{god1_y}% %{god1_z}% 2 0"
+							loop 3 time:
+								if {_god1slots} is 4:
+									set {_god1slots} to 1
+								set {casino_random_slot%{_god1slots}%::%player%} to random integer between 1 and 10
+								if {casino_random_slot%{_god1slots}%::%player%} is 1:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 80
+								if {casino_random_slot%{_god1slots}%::%player%} is 2:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 83
+								if {casino_random_slot%{_god1slots}%::%player%} is 3:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 86
+								if {casino_random_slot%{_god1slots}%::%player%} is 4:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 81
+								if {casino_random_slot%{_god1slots}%::%player%} is 5:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 84
+								if {casino_random_slot%{_god1slots}%::%player%} is 6:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 87
+								if {casino_random_slot%{_god1slots}%::%player%} is 7:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 82
+								if {casino_random_slot%{_god1slots}%::%player%} is 8:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 85
+								if {casino_random_slot%{_god1slots}%::%player%} is 9:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 88
+								if {casino_random_slot%{_god1slots}%::%player%} is 10:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 89
+								add 1 to {_god1slots}
+							command "entitydata @e[type=item_frame,x=%{god1_x}%,y=%{god1_y}%,z=%{god1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::god1slot1}%"",Damage:%{_damage::god1slot1}%s}}"
+							command "entitydata @e[type=item_frame,x=%{god1_x} - 1%,y=%{god1_y}%,z=%{god1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::god1slot2}%"",Damage:%{_damage::god1slot2}%s}}"
+							command "entitydata @e[type=item_frame,x=%{god1_x} + 1%,y=%{god1_y}%,z=%{god1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::god1slot3}%"",Damage:%{_damage::god1slot3}%s}}"
+							wait 5 tick
+						set {_god1slotp} to random integer between 1 and 1000
+						if {_god1slotp} is 1:
+							set {_casino_random_slot_happy} to random integer between 1 and 10
+							if {_casino_random_slot_happy} is 1:
+								set {_item::god1slot} to "filled_map"
+								set {_damage::god1slot} to 80
+							if {_casino_random_slot_happy} is 2:
+								set {_item::god1slot} to "filled_map"
+								set {_damage::god1slot} to 83
+							if {_casino_random_slot_happy} is 3:
+								set {_item::god1slot} to "filled_map"
+								set {_damage::god1slot} to 86
+							if {_casino_random_slot_happy} is 4:
+								set {_item::god1slot} to "filled_map"
+								set {_damage::god1slot} to 81
+							if {_casino_random_slot_happy} is 5:
+								set {_item::god1slot} to "filled_map"
+								set {_damage::god1slot} to 84
+							if {_casino_random_slot_happy} is 6:
+								set {_item::god1slot} to "filled_map"
+								set {_damage::god1slot} to 87
+							if {_casino_random_slot_happy} is 7:
+								set {_item::god1slot} to "filled_map"
+								set {_damage::god1slot} to 82
+							if {_casino_random_slot_happy} is 8:
+								set {_item::god1slot} to "filled_map"
+								set {_damage::god1slot} to 85
+							if {_casino_random_slot_happy} is 9:
+								set {_item::god1slot} to "filled_map"
+								set {_damage::god1slot} to 88
+							if {_casino_random_slot_happy} is 10:
+								set {_item::god1slot} to "filled_map"
+								set {_damage::god1slot} to 89
+							command "entitydata @e[type=item_frame,x=%{god1_x}%,y=%{god1_y}%,z=%{god1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::god1slot}%"",Damage:%{_damage::god1slot}%s}}"
+							command "playsound entity.zombie.attack_iron_door player @a %{god1_x}% %{god1_y}% %{god1_z}% 2 0"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{god1_x} - 1%,y=%{god1_y}%,z=%{god1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::god1slot}%"",Damage:%{_damage::god1slot}%s}}"
+							command "playsound entity.zombie.attack_iron_door player @a %{god1_x}% %{god1_y}% %{god1_z}% 2 0"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{god1_x} + 1%,y=%{god1_y}%,z=%{god1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::god1slot}%"",Damage:%{_damage::god1slot}%s}}"
+							command "playsound entity.zombie.attack_iron_door player @a %{god1_x}% %{god1_y}% %{god1_z}% 2 0"
+							wait 5 tick
+							command "emc %player% add {stock::%{god1_locations_number}%}"
+							command "/give %player% minecraft:gold_ore 1 0 {HideFlags:1,display:{Name:""§6§b§l§oOre of god"",Lore:[""§6§b§l§oBIG GOD§f§を当てた証である。"",""§f自慢しよう！！""]},ench:[{id:34,lvl:1}]}"
+							command "/playsound entity.wither.spawn player @a ~ ~ ~ 1"
+							command "/title @a title ""§d§n§l§o%player%§fは§6§b§l§oBIG GOD§fで勝利した!!"""
+							send "&l%player%&rさんは&4&l&n&o&k1&6&l&n&oBIG GOD&4&l&o&n&k1&rで&2&l7億円&f(&b&l%{stock::%{god1_locations_number}%}%EM&f)&rと&6&l&n&oOre of god&rをゲットしました。&f(&e&l当たり&f)" to all players
+							command "summon fireworks_rocket %{god1_x}% %{god1_y}% %{god1_z}% {NoGravity:1b,LifeTime:3,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:0,Colors:[I;4584447],FadeColors:[I;16152831]}]}}}}"
+							set {stock::%{god1_locations_number}%} to 700000000
+							set {playcrs::%player%} to 0
+							stop
+
+						else:
+							loop 3 time:
+								if {_god1slots} is 4:
+									set {_god1slots} to 1
+								set {casino_random_slot%{_god1slots}%::%player%} to random integer between 1 and 10
+								if {casino_random_slot%{_god1slots}%::%player%} is 1:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 80
+								if {casino_random_slot%{_god1slots}%::%player%} is 2:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 83
+								if {casino_random_slot%{_god1slots}%::%player%} is 3:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 86
+								if {casino_random_slot%{_god1slots}%::%player%} is 4:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 81
+								if {casino_random_slot%{_god1slots}%::%player%} is 5:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 84
+								if {casino_random_slot%{_god1slots}%::%player%} is 6:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 87
+								if {casino_random_slot%{_god1slots}%::%player%} is 7:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 82
+								if {casino_random_slot%{_god1slots}%::%player%} is 8:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 85
+								if {casino_random_slot%{_god1slots}%::%player%} is 9:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 88
+								if {casino_random_slot%{_god1slots}%::%player%} is 10:
+									set {_item::god1slot%{_god1slots}%} to "filled_map"
+									set {_damage::god1slot%{_god1slots}%} to 89
+								add 1 to {_god1slots}
+							command "entitydata @e[type=item_frame,x=%{god1_x}%,y=%{god1_y}%,z=%{god1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::god1slot1}%"",Damage:%{_damage::god1slot1}%s}}"
+							command "playsound entity.zombie.attack_iron_door player @a %{god1_x}% %{god1_y}% %{god1_z}% 2 0"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{god1_x} - 1%,y=%{god1_y}%,z=%{god1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::god1slot2}%"",Damage:%{_damage::god1slot2}%s}}"
+							command "playsound entity.zombie.attack_iron_door player @a %{god1_x}% %{god1_y}% %{god1_z}% 2 0"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{god1_x} + 1%,y=%{god1_y}%,z=%{god1_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::god1slot3}%"",Damage:%{_damage::god1slot3}%s}}"
+							command "playsound entity.zombie.attack_iron_door player @a %{god1_x}% %{god1_y}% %{god1_z}% 2 0"
+							wait 5 tick
+							if {casino_random_slot1::%player%} is {casino_random_slot2::%player%}:
+								if {casino_random_slot1::%player%} is {casino_random_slot3::%player%}:
+									if {casino_random_slot2::%player%} is {casino_random_slot3::%player%}:
+										command "emc %player% add {stock::%{god1_locations_number}%}"
+										command "/give %player% minecraft:gold_ore 1 0 {HideFlags:1,display:{Name:""§6§b§l§oOre of god"",Lore:[""§6§b§l§oBIG GOD§f§を当てた証である。"",""§f自慢しよう！！""]},ench:[{id:34,lvl:1}]}"
+										command "/playsound entity.wither.spawn player @a ~ ~ ~ 1"
+										command "/title @a title ""§d§n§l§o%player%§fは§6§b§l§oBIG GOD§fで勝利した!!"""
+										send "%player%さんはBIG GODで7億EMとOre of godをゲットしました。(当たり)" to channel with id "694725485992738906" with "eb"
+										send "%player%さんはBIG GODで勝利しました！！:tada: " to channel with id "694725485992738906" with "eb"
+										send "&l%player%&rさんは&4&l&n&o&k1&6&l&n&oBIG GOD&4&l&o&n&k1&rで&2&l7億円&f(&b&l%{stock::%{god1_locations_number}%}%EM&f)&rと&6&l&n&oOre of god&rをゲットしました。&f(&e&l当たり&f)" to all players
+										command "summon fireworks_rocket %{god1_x}% %{god1_y}% %{god1_z}% {NoGravity:1b,LifeTime:3,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:0,Colors:[I;4584447],FadeColors:[I;16152831]}]}}}}"
+										set {stock::%{god1_locations_number}%} to 700000000
+									else:
+										send "&c何もゲットできませんでした。" to player
+								else:
+									send "&c何もゲットできませんでした。" to player
+							else:
+								send "&c何もゲットできませんでした。" to player
+							set {playcrs::%player%} to 0
+							stop
+				else:
+					send "&cコイン(x300)が足りません。"
+	loop all entities in radius 5 of player:
+		if name of loop-entity is "sm5":
+			if player is holding 1 of magma cream with nbt "%{coinnbt::slotmachine}%":
+				if player has 5 of magma cream with nbt "%{coinnbt::slotmachine}%":
+					if {playcrs::%player%} is 1:
+						send "&c同時にスロットを回すことはできません。" to player
+						stop
+					else:
+						set {sm5_x} to loop-entity's x-coordinate + -0.5
+						set {sm5_y} to loop-entity's y-coordinate + 2.5
+						set {sm5_z} to loop-entity's z-coordinate + -1.5
+						set {sm5_locations_number} to "%{sm5_x}%%{sm5_y}%%{sm5_z}%"
+						set {playcrs::%player%} to 1
+						remove 5 of magma cream with nbt "%{coinnbt::slotmachine}%" from player's inventory
+						add 5000 to {stock::%{sm5_locations_number}%}
+						command "/blockdata %{sm5_x} + 1% %{sm5_y} -1% %{sm5_z}% {Text1:""{\""text\"":\""====================\""}"",Text2:""{\""text\"":\""\\u7802\\u6f20\\u30b9\\u30ed\\u30c3\\u30c8 1\\u56de5Cc\""}"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{stock::%{sm5_locations_number}%}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+						set {crstime::%player%} to random integer between 15 and 20
+						set {_desertslots} to 1
+						loop {crstime::%player%} time:
+							command "playsound block.sand.break player @a %{sm5_x}% %{sm5_y}% %{sm5_z}% 0.5 1"
+							loop 3 time:
+								if {_desertslots} is 4:
+									set {_desertslots} to 1
+								set {casino_random_slot%{_desertslots}%::%player%} to random integer between 1 and 7
+								if {casino_random_slot%{_desertslots}%::%player%} is 1:
+									set {_item::desertslot%{_desertslots}%} to "sand"
+									set {_damage::desertslot%{_desertslots}%} to 0
+								if {casino_random_slot%{_desertslots}%::%player%} is 2:
+									set {_item::desertslot%{_desertslots}%} to "deadbush"
+									set {_damage::desertslot%{_desertslots}%} to 0
+								if {casino_random_slot%{_desertslots}%::%player%} is 3:
+									set {_item::desertslot%{_desertslots}%} to "sandstone"
+									set {_damage::desertslot%{_desertslots}%} to 0
+								if {casino_random_slot%{_desertslots}%::%player%} is 4:
+									set {_item::desertslot%{_desertslots}%} to "sand"
+									set {_damage::desertslot%{_desertslots}%} to 1
+								if {casino_random_slot%{_desertslots}%::%player%} is 5:
+									set {_item::desertslot%{_desertslots}%} to "red_sandstone"
+									set {_damage::desertslot%{_desertslots}%} to 0
+								if {casino_random_slot%{_desertslots}%::%player%} is 6:
+									set {_item::desertslot%{_desertslots}%} to "cactus"
+									set {_damage::desertslot%{_desertslots}%} to 0
+								if {casino_random_slot%{_desertslots}%::%player%} is 7:
+									set {_item::desertslot%{_desertslots}%} to "hay_block"
+									set {_damage::desertslot%{_desertslots}%} to 0
+								add 1 to {_desertslots}
+							command "entitydata @e[type=item_frame,x=%{sm5_x} - 1%,y=%{sm5_y}%,z=%{sm5_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::desertslot1}%"",Damage:%{_damage::desertslot1}%s}}"
+							command "entitydata @e[type=item_frame,x=%{sm5_x}%,y=%{sm5_y}%,z=%{sm5_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::desertslot2}%"",Damage:%{_damage::desertslot2}%s}}"
+							command "entitydata @e[type=item_frame,x=%{sm5_x} + 1%,y=%{sm5_y}%,z=%{sm5_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::desertslot3}%"",Damage:%{_damage::desertslot3}%s}}"
+							wait 5 tick
+						set {_desertslotp} to random integer between 1 and 25
+						if {_desertslotp} is 4:
+							set {_casino_random_slot_happy} to random integer between 1 and 7
+							if {_casino_random_slot_happy} is 1:
+								set {_item::desertslot} to "sand"
+								set {_damage::desertslot} to 0
+							if {_casino_random_slot_happy} is 2:
+								set {_item::desertslot} to "deadbush"
+								set {_damage::desertslot} to 0
+							if {_casino_random_slot_happy} is 3:
+								set {_item::desertslot} to "sandstone"
+								set {_damage::desertslot} to 0
+							if {_casino_random_slot_happy} is 4:
+								set {_item::desertslot} to "sand"
+								set {_damage::desertslot} to 1
+							if {_casino_random_slot_happy} is 5:
+								set {_item::desertslot} to "red_sandstone"
+								set {_damage::desertslot} to 0
+							if {_casino_random_slot_happy} is 6:
+								set {_item::desertslot} to "cactus"
+								set {_damage::desertslot} to 0
+							if {_casino_random_slot_happy} is 7:
+								set {_item::desertslot} to "hay_block"
+								set {_damage::desertslot} to 0
+							command "entitydata @e[type=item_frame,x=%{sm5_x} - 1%,y=%{sm5_y}%,z=%{sm5_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::desertslot}%"",Damage:%{_damage::desertslot}%s}}"
+							command "playsound block.sand.break player @a %{sm5_x}% %{sm5_y}% %{sm5_z}% 0.5 1"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{sm5_x}%,y=%{sm5_y}%,z=%{sm5_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::desertslot}%"",Damage:%{_damage::desertslot}%s}}"
+							command "playsound block.sand.break player @a %{sm5_x}% %{sm5_y}% %{sm5_z}% 0.5 1"
+							wait 5 tick
+							command "playsound block.sand.break player @a %{sm5_x}% %{sm5_y}% %{sm5_z}% 0.5 1"
+							command "entitydata @e[type=item_frame,x=%{sm5_x} + 1%,y=%{sm5_y}%,z=%{sm5_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::desertslot}%"",Damage:%{_damage::desertslot}%s}}"
+							wait 5 tick
+							if {_casino_random_slot_happy} is 6:
+								command "emc %player% add %{stock::%{sm5_locations_number}%} * 2%"
+								send "&l%player%&rさんは&a&l&n砂漠スロット&rで&2&l%{stock::%{sm5_locations_number}%} * 2%EM&rをゲットしました。&f(&e&l大当たり&f)" to all players
+								send "%player%さんは砂漠スロットで%{stock::%{sm5_locations_number}%} * 2%EMをゲットしました。(大当たり)" to channel with id "694725485992738906" with "eb"
+								set {stock::%{sm5_locations_number}%} to 1000000
+								command "summon fireworks_rocket %{sm5_x}% %{sm5_y}% %{sm5_z}% {NoGravity:1b,LifeTime:3,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Flicker:1,Colors:[I;2606080],FadeColors:[I;2883428]}]}}}}"
+								set {playcrs::%player%} to 0
+								command "/blockdata %{sm5_x}% %{sm5_y} + 1% %{sm5_z}% {Text1:""{\""text\"":\""====================\""}"",Text2:""[\""\"",{\""text\"":\""\\u8349\\u30b9\\u30ed\\u30c3\\u30c8 \""},{\""text\"":\""1\\u56de\"",\""color\"":\""black\""},{\""text\"":\""1\"",\""color\"":\""blue\""},{\""text\"":\""Cc\"",\""color\"":\""black\""}]"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{stock::%{sm5_locations_number}%}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+								stop
+							else:
+								command "emc %player% add %{stock::%{sm5_locations_number}%}%"
+								send "&l%player%&rさんは&a&l&n砂漠スロット&rで&2&l%{stock::%{sm5_locations_number}%}%EM&rをゲットしました。&f(&e&l当たり&f)" to all players
+								send "%player%さんは砂漠スロットで%{stock::%{sm5_locations_number}%}%EMをゲットしました。(当たり)" to channel with id "694725485992738906" with "eb"
+								set {stock::%{sm5_locations_number}%} to 1000000
+								command "summon fireworks_rocket %{sm5_x}% %{sm5_y}% %{sm5_z}% {NoGravity:1b,LifeTime:3,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Flicker:1,Colors:[I;2606080],FadeColors:[I;2883428]}]}}}}"
+								set {playcrs::%player%} to 0
+								command "/blockdata %{sm5_x} + 1% %{sm5_y} -1% %{sm5_z}% {Text1:""{\""text\"":\""====================\""}"",Text2:""{\""text\"":\""\\u7802\\u6f20\\u30b9\\u30ed\\u30c3\\u30c8 1\\u56de5Cc\""}"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{stock::%{sm5_locations_number}%}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+								stop
+						else:
+							loop 3 time:
+								if {_desertslots} is 4:
+									set {_desertslots} to 1
+								set {casino_random_slot%{_desertslots}%::%player%} to random integer between 1 and 7
+								if {casino_random_slot%{_desertslots}%::%player%} is 1:
+									set {_item::desertslot%{_desertslots}%} to "sand"
+									set {_damage::desertslot%{_desertslots}%} to 0
+								if {casino_random_slot%{_desertslots}%::%player%} is 2:
+									set {_item::desertslot%{_desertslots}%} to "deadbush"
+									set {_damage::desertslot%{_desertslots}%} to 0
+								if {casino_random_slot%{_desertslots}%::%player%} is 3:
+									set {_item::desertslot%{_desertslots}%} to "sandstone"
+									set {_damage::desertslot%{_desertslots}%} to 0
+								if {casino_random_slot%{_desertslots}%::%player%} is 4:
+									set {_item::desertslot%{_desertslots}%} to "sand"
+									set {_damage::desertslot%{_desertslots}%} to 1
+								if {casino_random_slot%{_desertslots}%::%player%} is 5:
+									set {_item::desertslot%{_desertslots}%} to "red_sandstone"
+									set {_damage::desertslot%{_desertslots}%} to 0
+								if {casino_random_slot%{_desertslots}%::%player%} is 6:
+									set {_item::desertslot%{_desertslots}%} to "cactus"
+									set {_damage::desertslot%{_desertslots}%} to 0
+								if {casino_random_slot%{_desertslots}%::%player%} is 7:
+									set {_item::desertslot%{_desertslots}%} to "hay_block"
+									set {_damage::desertslot%{_desertslots}%} to 0
+								add 1 to {_desertslots}
+							command "entitydata @e[type=item_frame,x=%{sm5_x} - 1%,y=%{sm5_y}%,z=%{sm5_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::desertslot1}%"",Damage:%{_damage::desertslot1}%s}}"
+							command "playsound block.sand.break player @a %{sm5_x}% %{sm5_y}% %{sm5_z}% 0.5 1"
+							wait 5 tick
+							command "entitydata @e[type=item_frame,x=%{sm5_x}%,y=%{sm5_y}%,z=%{sm5_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::desertslot2}%"",Damage:%{_damage::desertslot2}%s}}"
+							command "playsound block.sand.break player @a %{sm5_x}% %{sm5_y}% %{sm5_z}% 0.5 1"
+							wait 5 tick
+							command "playsound block.sand.break player @a %{sm5_x}% %{sm5_y}% %{sm5_z}% 0.5 1"
+							command "entitydata @e[type=item_frame,x=%{sm5_x} + 1%,y=%{sm5_y}%,z=%{sm5_z}%,dx=0,dy=0,dz=0] {Item:{id:""minecraft:%{_item::desertslot3}%"",Damage:%{_damage::desertslot3}%s}}"
+							wait 5 tick
+							if {casino_random_slot1::%player%} is {casino_random_slot2::%player%}:
+								if {casino_random_slot1::%player%} is {casino_random_slot3::%player%}:
+									if {casino_random_slot2::%player%} is {casino_random_slot3::%player%}:
+										if {casino_random_slot1::%player%} is 6:
+											command "emc %player% add %{stock::%{sm5_locations_number}%} * 2%"
+											send "&l%player%&rさんは&a&l&n砂漠スロット&rで&2&l%{stock::%{sm5_locations_number}%} * 2%EM&rと&a&l&n&oシャイングラスブロック&rをゲットしました。&f(&e&l大当たり&f)" to all players
+											send "%player%さんは砂漠スロットで%{stock::%{sm5_locations_number}%} * 2%EMとシャイングラスブロックをゲットしました。(大当たり)" to channel with id "694725485992738906" with "eb"
+											set {stock::%{sm5_locations_number}%} to 1000000
+											command "summon fireworks_rocket %{sm5_x}% %{sm5_y}% %{sm5_z}% {NoGravity:1b,LifeTime:3,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Flicker:1,Colors:[I;2606080],FadeColors:[I;2883428]}]}}}}"
+										else:
+											command "emc %player% add %{stock::%{sm5_locations_number}%}%"
+											send "&l%player%&rさんは&a&l&n砂漠スロット&rで&2&l%{stock::%{sm5_locations_number}%}%EM&rをゲットしました。&f(&e&l当たり&f)" to all players
+											send "%player%さんは砂漠スロットで%{stock::%{sm5_locations_number}%}%EMをゲットしました。(当たり)" to channel with id "694725485992738906" with "eb"
+											set {stock::%{sm5_locations_number}%} to 1000000
+											command "summon fireworks_rocket %{sm5_x}% %{sm5_y}% %{sm5_z}% {NoGravity:1b,LifeTime:3,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Flicker:1,Colors:[I;2606080],FadeColors:[I;2883428]}]}}}}"
+									else:
+										send "&c何もゲットできませんでした。" to player
+								else:
+									send "&c何もゲットできませんでした。" to player
+							else:
+								send "&c何もゲットできませんでした。" to player
+							set {playcrs::%player%} to 0
+							command "/blockdata %{sm5_x} + 1% %{sm5_y} -1% %{sm5_z}% {Text1:""{\""text\"":\""====================\""}"",Text2:""{\""text\"":\""\\u7802\\u6f20\\u30b9\\u30ed\\u30c3\\u30c8 1\\u56de5Cc\""}"",Text3:""[\""\"",{\""text\"":\""\\u30b9\\u30c8\\u30c3\\u30af\""},{\""text\"":\"":\"",\""color\"":\""gray\""},{\""text\"":\""%{stock::%{sm5_locations_number}%}%\""}]"",Text4:""{\""text\"":\""====================\""}""}"
+							stop
+				else:
+					send "&cコイン(x5)が足りません"

@@ -1,0 +1,109 @@
+function cutleave(l: location , p: player):
+	loop blocks in radius 5 around {_l}:
+		if "%type of loop-block%" contains "leaf":
+			set block at loop-block's location to air
+			command "execute %{_p}% ~ ~ ~ /playsound block.grass.break block @a ~ ~ ~ 1 1"
+			set {_r} to random integer between 1 and 125
+			if {_r} is 5:
+				command "give %{_p}% apple"
+			if {_r} is 10:
+				command "give %{_p}% apple"
+			if {_r} is 15:
+				command "give %{_p}% apple"
+			if {_r} is 20:
+				command "give %{_p}% sapling 1 0"
+			if {_r} is 21:
+				command "give %{_p}% sapling 1 1"
+			if {_r} is 22:
+				command "give %{_p}% sapling 1 2"
+			if {_r} is 23:
+				command "give %{_p}% sapling 1 3"
+			if {_r} is 24:
+				command "give %{_p}% sapling 1 4"
+			if {_r} is 25:
+				command "give %{_p}% sapling 1 5"
+			set {_r} to random integer between 1 and 25
+			if {_r} is 3:
+				command "give %{_p}% stick 1 0"
+function cutoak(l: location , p: player):
+	loop blocks in radius 2 around {_l}:
+		if loop-block is oak log:
+			set block at loop-block to air
+			command "give %{_p}% log 1 0"
+			command "execute %{_p}% ~ ~ ~ /playsound block.wood.break block @a ~ ~ ~ 1 1"
+			wait 2 tick
+			cutoak(loop-block , {_p})
+			cutleave(loop-block , {_p})
+function cutdarkoak(l: location , p: player):
+	loop blocks in radius 2 around {_l}:
+		if loop-block is dark oak log:
+			set block at loop-block to air
+			command "give %{_p}% log2 1 1"
+			command "execute %{_p}% ~ ~ ~ /playsound block.wood.break block @a ~ ~ ~ 1 1"
+			wait 2 tick
+			cutdarkoak(loop-block , {_p})
+			cutleave(loop-block , {_p})
+function cutbirch(l: location , p: player):
+	loop blocks in radius 2 around {_l}:
+		if loop-block is birch log:
+			set block at loop-block to air
+			command "give %{_p}% log 1 2"
+			wait 2 tick
+			cutbirch(loop-block , {_p})
+			cutleave(loop-block , {_p})
+function cutjungle(l: location , p: player):
+	loop blocks in radius 2 around {_l}:
+		if loop-block is jungle log:
+			set block at loop-block to air
+			command "give %{_p}% log 1 3"
+			command "execute %{_p}% ~ ~ ~ /playsound block.wood.break block @a ~ ~ ~ 1 1"
+			wait 2 tick
+			cutjungle(loop-block , {_p})
+			cutleave(loop-block , {_p})
+function cutspruce(l: location , p: player):
+	loop blocks in radius 2 around {_l}:
+		if loop-block is spruce log:
+			set block at loop-block to air
+			command "give %{_p}% log 1 1"
+			command "execute %{_p}% ~ ~ ~ /playsound block.wood.break block @a ~ ~ ~ 1 1"
+			wait 2 tick
+			cutspruce(loop-block , {_p})
+			cutleave(loop-block , {_p})
+function cutacacia(l: location , p: player):
+	loop blocks in radius 2 around {_l}:
+		if loop-block is acacia log:
+			set block at loop-block to air
+			command "give %{_p}% log2 1 0"
+			command "execute %{_p}% ~ ~ ~ /playsound block.wood.break block @a ~ ~ ~ 1 1"
+			wait 2 tick
+			cutacacia(loop-block , {_p})
+			cutleave(loop-block , {_p})
+on block break:
+	if {eaccess.slot.5::%player%} is tripwire hook with nbt "{HideFlags:1,display:{Name:""&cカットオールの輪"",Lore:[""&f原木を一括破壊できる。フリーワールド用である。"",""&f&m見た目は輪じゃない"",""&f左指か右指に着けることができる。"",""&fアクセサリーで使用可能""]}}":
+		player's tool is axe:
+			if event-block is oak log:
+				cutoak(event-location , player)
+			if event-block is dark oak log:
+				cutdarkoak(event-location , player)
+			if event-block is birch log:
+				cutbirch(event-location , player)
+			if event-block is jungle log:
+				cutjungle(event-location , player)
+			if event-block is spruce log:
+				cutspruce(event-location , player)
+			if event-block is acacia log:
+				cutacacia(event-location , player)
+	if {eaccess.slot.6::%player%} is tripwire hook with nbt "{HideFlags:1,display:{Name:""&cカットオールの輪"",Lore:[""&f原木を一括破壊できる。フリーワールド用である。"",""&f&m見た目は輪じゃない"",""&f左指か右指に着けることができる。"",""&fアクセサリーで使用可能""]}}":
+		player's tool is axe:
+			if event-block is oak log:
+				cutoak(event-location , player)
+			if event-block is dark oak log:
+				cutdarkoak(event-location , player)
+			if event-block is birch log:
+				cutbirch(event-location , player)
+			if event-block is jungle log:
+				cutjungle(event-location , player)
+			if event-block is spruce log:
+				cutspruce(event-location , player)
+			if event-block is acacia log:
+				cutacacia(event-location , player)

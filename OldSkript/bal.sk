@@ -1,0 +1,251 @@
+every seconds:
+	loop all players:
+		command "/money set %loop-player% %{balance::%loop-player%}%"
+
+command /baldiv [<num>]:
+	permission: admin 
+	trigger:
+		loop {balance::*}:
+			set {_b} to {balance::%loop-index%} / arg-1
+			set {balance::%loop-index%} to {_b}
+		send "すべてのプレイヤーの所持金が所持金 / %arg-1%になりますた↓" to all players
+command /balreset:
+	permission: admin 
+	trigger:
+		loop {balance::*}:
+			if {balance::%loop-index%} is greater than 5000000:
+				set {balance::%loop-index%} to 5000000
+		loop {loan::*}:
+			set {loan::%loop-index%} to 5000000
+		send "500万以上の所持金は500万になりました。" to all players
+command /balmul [<num>]:
+	permission: admin 
+	trigger:
+		loop {balance::*}:
+			set {_b} to {balance::%loop-index%} * arg-1
+			set {balance::%loop-index%} to {_b}
+		send "すべてのプレイヤーの所持金が所持金 x %arg-1%になりますた↑" to all players
+command /setbal [<offlineplayer>] [<num>]:
+	permission: admin 
+	trigger:
+		set {balance::%arg-1%} to arg-2
+command /bal [<offlineplayer>]:
+	aliases: /balance
+	trigger:
+		if {balance::%player%} is not set:
+			set {balance::%player%} to 0
+		if arg 1 is not set:
+			send "&l残高&f&r:&7%{balance::%player%}%&r&fEM"
+		else:
+			send "&l%arg 1%&rの&l残高&f&r:&7%{balance::%arg 1%}%&r&fEM"
+command /emcard [<num>] [<int>]:
+	trigger:
+		if arg 2 is set:
+			set {_c} to arg-2
+		else:
+			set {_c} to 1
+		if arg 1 is set:
+			if {balance::%player%} is greater than or equal to (arg-1 * {_c}):
+				command "emc %player% remove %arg-1 * {_c}%"
+				give {_c} of paper named "&7%arg-1%&2EM&f - EmeMoneyCard" with lore "&fEMカード発行者&7:&f%player%" to player
+			else:
+				send "&cお金が足りません。"
+		else:
+			send "&c使い方:/emcard [金額]" to player
+on rightclick with paper:
+	if name of player's tool contains "&2EM&f - EmeMoneyCard":
+		if player is in "build_world":
+			send "建築サーバーでEBIGを使うことはできません。" to player
+			stop
+		set {_n} to name of player's tool
+		replace all "&2EM&f - EmeMoneyCard" with "" in {_n}
+		replace all "&7" with "" in {_n}
+		set {_m} to {_n} parsed as an integer
+		remove 1 of player's tool from player's inventory
+		add {_m} to {balance::%player%}
+		send "&a仮想通貨に入れました。"
+command /empay [<offlineplayer>] [<num>]:
+	aliases : /empay
+	trigger:
+		arg 1 is set
+		arg 2 is set
+		if {balance::%player%} is greater than or equal to arg 2:
+			if arg 2 is greater than 0:
+				subtract arg 2 from {balance::%player%}
+				add arg 2 to {balance::%arg 1%}
+				send "&l%arg 1%&rに&7%arg 2%&r&fEM送金しました。"
+				send "&l%player%&rから&7%arg 2%&r&fEM受け取りました。" to arg 1												
+			else:
+				send "&71&fEM未満の金額は送金できません。&71&f以上にしてください。"
+		else:
+			send "&cお金が足りません。"
+on command "/money pay":
+	send "&cこのコマンドは使用できません。「/empay [プレイヤーID] [金額]」を使って送金してください。" to player
+	cancel event
+command /emc [<player>] <text> [<number>] [<int>]:
+	aliases : /emeraldmoneycontrol
+	permission: admin
+	trigger:
+		if arg-4 is not set:
+			set {emcount2::%player%} to 1
+		else:
+			set {emcount2::%player%} to arg-4
+		if arg 2 is "add":
+			if arg 3 is greater than 0:
+				add arg 3 to {balance::%arg 1%}
+				send "&7%arg 3%&fEMを受け取りました。" to arg 1
+				send "&l%arg 1%&rに&7%arg 3%&fEMを送りました。"
+			else:
+				send "&71&fEM未満の金額は送金できません。&71&f以上にしてください。"
+		else if arg 2 is "remove":
+			if arg 3 is greater than 0:
+				if arg 3 is less than or equal to {balance::%arg 1%}:
+					subtract arg 3 from {balance::%arg 1%}
+					send "&7%arg 3%&fEMを支払いました。" to arg 1
+					send "&l%arg 1%&rに&7%arg 3%&fEMを支払わせました。"
+				else:
+					send "相手のお金が足りません。"
+			else:
+				send "&71&fEM未満の金額は送金できません。&71&f以上にしてください。"
+		else if arg 2 is "set":
+			set {balance::%arg 1%} to arg 3
+			send "&7%arg 3%&fEMにセットされました。" to arg 1
+			send "&l%arg 1%&rに&7%arg 3%&fEMをセットしました。"
+		else if arg 2 is "change":
+			if arg 3 is 1:
+				if arg 1 has {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""1EMの現金である。""],Name:""1EM""}}":
+					remove {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""1EMの現金である。""],Name:""1EM""}}" from inventory of arg 1
+					add 1 to {balance::%arg 1%}
+					send "仮想通貨に&7%1 * {emcount2::%player%}%&fEMを振り込みました。" to arg 1
+				else:
+					send "お金が足りないゾ!" to arg 1
+			else if arg 3 is 10:
+				if arg 1 has {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""10EMの現金である。""],Name:""10EM""}}":
+					remove {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""10EMの現金である。""],Name:""10EM""}}" from inventory of arg 1
+					add 10 * {emcount2::%player%} to {balance::%arg 1%}
+					send "仮想通貨に&7%1 * {emcount2::%player%}%0&fEMを振り込みました。" to arg 1
+				else:
+					send "お金が足りないゾ!" to arg 1
+			else if arg 3 is 100:
+				if arg 1 has {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""100EMの現金である。""],Name:""100EM""}}":
+					remove {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""100EMの現金である。""],Name:""100EM""}}" from inventory of arg 1
+					add 100 * {emcount2::%player%} to {balance::%arg 1%}
+					send "仮想通貨に&7%1 * {emcount2::%player%}%00&fEMを振り込みました。" to arg 1
+				else:
+					send "お金が足りないゾ!" to arg 1
+			else if arg 3 is 1000:
+				if arg 1 has {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""1,000EMの現金である。""],Name:""1,000EM""}}":
+					remove {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""1,000EMの現金である。""],Name:""1,000EM""}}" from inventory of arg 1
+					add 1000 * {emcount2::%player%} to {balance::%arg 1%}
+					send "仮想通貨に&7%1 * {emcount2::%player%}%,000&fEMを振り込みました。" to arg 1
+				else:
+					send "お金が足りないゾ!" to arg 1
+			else if arg 3 is 10000:
+				if arg 1 has {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""10,000EMの現金である。""],Name:""10,000EM""}}":
+					remove {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""10,000EMの現金である。""],Name:""10,000EM""}}" from inventory of arg 1
+					add 10000 * {emcount2::%player%} to {balance::%arg 1%}
+					send "仮想通貨に&7%1 * {emcount2::%player%}%0,000&fEMを振り込みました。" to arg 1
+				else:
+					send "お金が足りないゾ!" to arg 1
+			else if arg 3 is 100000:
+				if arg 1 has {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""100,000EMの現金である。""],Name:""100,000EM""}}":
+					remove {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""100,000EMの現金である。""],Name:""100,000EM""}}" from inventory of arg 1
+					add 100000 * {emcount2::%player%} to {balance::%arg 1%}
+					send "仮想通貨に&7%1 * {emcount2::%player%}%00,000&fEMを振り込みました。" to arg 1
+				else:
+					send "お金が足りないゾ!" to arg 1
+			else if arg 3 is 1000000:
+				if arg 1 has {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""1,000,000EMの現金である。""],Name:""1,000,000EM""}}":
+					remove {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""1,000,000EMの現金である。""],Name:""1,000,000EM""}}" from inventory of arg 1
+					add 1000000 * {emcount2::%player%} to {balance::%arg 1%}
+					send "仮想通貨に&7%1 * {emcount2::%player%}%,000,000&fEMを振り込みました。" to arg 1
+				else:
+					send "お金が足りないゾ!" to arg 1
+			else if arg 3 is 10000000:
+				if arg 1 has {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""10,000,000EMの現金である。""],Name:""10,000,000EM""}}":
+					remove {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""10,000,000EMの現金である。""],Name:""10,000,000EM""}}" from inventory of arg 1
+					add 10000000 * {emcount2::%player%} to {balance::%arg 1%}
+					send "仮想通貨に&7%1 * {emcount2::%player%}%0,000,000&fEMを振り込みました。" to arg 1
+				else:
+					send "お金が足りないゾ!" to arg 1
+			else if arg 3 is 100000000:
+				if arg 1 has {emcount2::%player%} of emerald with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""100,000,000EMの現金である。""],Name:""100,000,000EM""}}":
+					remove {emcount2::%player%} of emerald with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""100,000,000EMの現金である。""],Name:""100,000,000EM""}}" from inventory of arg 1
+					add 100000000 * {emcount2::%player%} to {balance::%arg 1%}
+					send "仮想通貨に&7%1 * {emcount2::%player%}%00,000,000&fEMを振り込みました。" to arg 1
+				else:
+					send "お金が足りないゾ!" to arg 1
+			else:
+				send "変数が違います。" to arg 1
+		else if arg 2 is "change2":
+			if arg-1 has enough space for {emcount2::%player%} or gold ingot:
+			else:
+				send "&c空きがありません。" to arg-1
+				stop
+			if arg 3 is 1:
+				if 1 is less than or equal to {balance::%arg 1%}:
+					subtract arg 3 * {emcount2::%player%} from {balance::%arg 1%}
+					give {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""1EMの現金である。""],Name:""1EM""}}" to arg 1
+					send "仮想通貨に&7%1 * {emcount2::%player%}%&fEMを引き出しました。" to arg 1
+				else:
+					send "お金が足りないゾ!"
+			else if arg 3 is 10:
+				if 10 is less than or equal to {balance::%arg 1%}:
+					subtract arg 3 * {emcount2::%player%} from {balance::%arg 1%}
+					give {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""10EMの現金である。""],Name:""10EM""}}" to arg 1
+					send "仮想通貨に&7%1 * {emcount2::%player%}%0&fEMを引き出しました。" to arg 1
+				else:
+					send "お金が足りないゾ!"
+			else if arg 3 is 100:
+				if 100 is less than or equal to {balance::%arg 1%}:
+					subtract arg 3 * {emcount2::%player%} from {balance::%arg 1%}
+					give {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""100EMの現金である。""],Name:""100EM""}}" to arg 1
+					send "仮想通貨に&7%1 * {emcount2::%player%}%00&fEMを引き出しました。" to arg 1
+				else:
+					send "お金が足りないゾ!"
+			else if arg 3 is 1000:
+				if 1000 is less than or equal to {balance::%arg 1%}:
+					subtract arg 3 * {emcount2::%player%} from {balance::%arg 1%}
+					give {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""1,000EMの現金である。""],Name:""1,000EM""}}" to arg 1
+					send "仮想通貨に&7%1 * {emcount2::%player%}%,000&fEMを引き出しました。" to arg 1
+				else:
+					send "お金が足りないゾ!"
+			else if arg 3 is 10000:
+				if 10000 is less than or equal to {balance::%arg 1%}:
+					subtract arg 3 * {emcount2::%player%} from {balance::%arg 1%}
+					give {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""10,000EMの現金である。""],Name:""10,000EM""}}" to arg 1
+					send "仮想通貨に&7%1 * {emcount2::%player%}%0,000&fEMを引き出しました。" to arg 1
+				else:
+					send "お金が足りないゾ!"
+			else if arg 3 is 100000:
+				if 100000 is less than or equal to {balance::%arg 1%}:
+					subtract arg 3 * {emcount2::%player%} from {balance::%arg 1%}
+					give {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""100,000EMの現金である。""],Name:""100,000EM""}}" to arg 1
+					send "仮想通貨に&7%1 * {emcount2::%player%}%00,000&fEMを引き出しました。" to arg 1
+				else:
+					send "お金が足りないゾ!"
+			else if arg 3 is 1000000:
+				if 1000000 is less than or equal to {balance::%arg 1%}:
+					subtract arg 3 * {emcount2::%player%} from {balance::%arg 1%}
+					give {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""1,000,000EMの現金である。""],Name:""1,000,000EM""}}" to arg 1
+					send "仮想通貨に&7%1 * {emcount2::%player%}%,000,000&fEMを引き出しました。" to arg 1
+				else:
+					send "お金が足りないゾ!"
+			else if arg 3 is 10000000:
+				if 10000000 is less than or equal to {balance::%arg 1%}:
+					subtract arg 3 * {emcount2::%player%} from {balance::%arg 1%}
+					give {emcount2::%player%} of gold ingot with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""10,000,000EMの現金である。""],Name:""10,000,000EM""}}" to arg 1
+					send "仮想通貨に&7%1 * {emcount2::%player%}%0,000,000&fEMを引き出しました。" to arg 1
+				else:
+					send "お金が足りないゾ!"
+			else if arg 3 is 100000000:
+				if 100000000 is less than or equal to {balance::%arg 1%}:
+					subtract arg 3 * {emcount2::%player%} from {balance::%arg 1%}
+					give {emcount2::%player%} of emerald with nbt "{ench:[{id:8s,lvl:2s}],HideFlags:1,display:{Lore:[""100,000,000EMの現金である。""],Name:""100,000,000EM""}}" to arg 1
+					send "仮想通貨に&7%1 * {emcount2::%player%}%00,000,000&fEMを引き出しました。" to arg 1
+				else:
+					send "お金が足りないゾ!"
+			else:
+				send "変数が違います。"
+		else:
+			send "あれはダメみたいですね...(冷静)"
